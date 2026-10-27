@@ -1,0 +1,37 @@
+<div class="data-table-container">
+  <ion-searchbar
+    [debounce]="300"
+    placeholder="Buscar..."
+    (ionInput)="onSearchChange($event)"
+  ></ion-searchbar>
+
+  <ion-grid class="data-table-header">
+    <ion-row>
+      <ion-col *ngFor="let column of columns" class="header-col">
+        <strong>{{ column | titlecase }}</strong>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-list class="data-table-list">
+    <ion-item
+      *ngFor="let item of filteredData"
+      button
+      (click)="onRowClick(item)"
+      class="data-table-row"
+    >
+      <ion-grid>
+        <ion-row>
+          <ion-col *ngFor="let column of columns" class="data-col">
+            <ion-label>{{ getColumnValue(item, column) }}</ion-label>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+  </ion-list>
+
+  <div *ngIf="filteredData.length === 0" class="no-data">
+    <p>No hay datos para mostrar</p>
+  </div>
+</div>
+

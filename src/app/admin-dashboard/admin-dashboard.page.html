@@ -11,17 +11,50 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Bienvenido Administrador</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      Esta es la página exclusiva para usuarios con rol de administrador.
-    </ion-card-content>
-  </ion-card>
+  <h2 class="section-title">Estadísticas</h2>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="4">
+        <app-stat-card
+          title="Usuarios Activos"
+          [value]="usuariosActivos"
+          icon="people-outline"
+          color="primary"
+        ></app-stat-card>
+      </ion-col>
+      <ion-col size="12" size-md="4">
+        <app-stat-card
+          title="Ingresos"
+          [value]="ingresos"
+          icon="cash-outline"
+          color="success"
+        ></app-stat-card>
+      </ion-col>
+      <ion-col size="12" size-md="4">
+        <app-stat-card
+          title="Transacciones"
+          [value]="transacciones"
+          icon="cart-outline"
+          color="warning"
+        ></app-stat-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <h2 class="section-title ion-margin-top">Lista de Usuarios</h2>
+  <app-data-table
+    [data]="usuarios"
+    [columns]="columns"
+    (rowSelected)="onRowSelected($event)"
+  ></app-data-table>
+
+  <ion-button expand="block" color="medium" (click)="mostrarToast()" class="ion-margin-top">
+    Actualizar Datos
+  </ion-button>
 
   <ion-button expand="block" color="danger" (click)="logout()" class="ion-margin-top">
     Cerrar Sesión
   </ion-button>
 </ion-content>
+
 

@@ -1,0 +1,12 @@
+<ion-card [color]="color" class="stat-card">
+  <ion-card-header class="stat-card-header">
+    <div class="stat-card-content">
+      <ion-icon *ngIf="icon" [name]="icon" class="stat-card-icon"></ion-icon>
+      <div class="stat-card-text">
+        <ion-card-title class="stat-card-title">{{ title }}</ion-card-title>
+        <div class="stat-card-value">{{ value }}</div>
+      </div>
+    </div>
+  </ion-card-header>
+</ion-card>
+
