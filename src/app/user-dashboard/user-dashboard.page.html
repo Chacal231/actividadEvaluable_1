@@ -1,0 +1,27 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Panel de Usuario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Panel de Usuario</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Bienvenido Usuario</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      Esta es la página para usuarios estándar y también accesible para administradores.
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" color="danger" (click)="logout()" class="ion-margin-top">
+    Cerrar Sesión
+  </ion-button>
+</ion-content>
+

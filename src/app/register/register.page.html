@@ -1,0 +1,88 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Registro</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Registro</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+    <ion-item>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input type="text" formControlName="nombre"></ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="registerForm.get('nombre')?.touched && registerForm.get('nombre')?.hasError('required')">
+      El nombre es requerido
+    </ion-note>
+    <ion-note color="danger" *ngIf="registerForm.get('nombre')?.touched && registerForm.get('nombre')?.hasError('minlength')">
+      Mínimo 2 caracteres
+    </ion-note>
+
+    <ion-item>
+      <ion-label position="floating">Email</ion-label>
+      <ion-input type="email" formControlName="email"></ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.hasError('required')">
+      El email es requerido
+    </ion-note>
+    <ion-note color="danger" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.hasError('email')">
+      Email con formato inválido
+    </ion-note>
+    <ion-note color="danger" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.hasError('emailTomado')">
+      El email ya existe
+    </ion-note>
+
+    <ion-item>
+      <ion-label position="floating">Contraseña</ion-label>
+      <ion-input type="password" formControlName="password"></ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.hasError('required')">
+      La contraseña es requerida
+    </ion-note>
+    <ion-note color="danger" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.hasError('minlength')">
+      Mínimo 6 caracteres
+    </ion-note>
+
+    <ion-item>
+      <ion-label position="floating">Confirmar Contraseña</ion-label>
+      <ion-input type="password" formControlName="confirmPassword"></ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.hasError('required')">
+      Confirmar contraseña es requerido
+    </ion-note>
+    <ion-note color="danger" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.hasError('passwordMismatch')">
+      Las contraseñas no coinciden
+    </ion-note>
+
+    <ion-item>
+      <ion-label>Rol</ion-label>
+      <ion-select formControlName="role" placeholder="Seleccionar rol">
+        <ion-select-option value="user">Usuario</ion-select-option>
+        <ion-select-option value="admin">Administrador</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" [disabled]="registerForm.invalid || registerForm.pending" class="ion-margin-top">
+      Registrarse
+    </ion-button>
+  </form>
+
+  <ion-text color="danger" *ngIf="errorMessage">
+    <p class="ion-text-center">{{ errorMessage }}</p>
+  </ion-text>
+
+  <ion-text color="success" *ngIf="successMessage">
+    <p class="ion-text-center">{{ successMessage }}</p>
+  </ion-text>
+
+  <ion-button expand="block" fill="clear" (click)="goToLogin()">
+    ¿Ya tienes cuenta? Inicia sesión
+  </ion-button>
+</ion-content>
+
+

@@ -1,0 +1,59 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Login</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+    <ion-item>
+      <ion-label position="floating">Email</ion-label>
+      <ion-input type="email" formControlName="email"></ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')">
+      El email es requerido
+    </ion-note>
+    <ion-note color="danger" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.hasError('email')">
+      Email con formato inválido
+    </ion-note>
+
+    <ion-item>
+      <ion-label position="floating">Contraseña</ion-label>
+      <ion-input type="password" formControlName="password"></ion-input>
+    </ion-item>
+    <ion-note color="danger" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')">
+      La contraseña es requerida
+    </ion-note>
+    <ion-note color="danger" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('minlength')">
+      Mínimo 6 caracteres
+    </ion-note>
+
+    <ion-button expand="block" type="submit" [disabled]="loginForm.invalid" class="ion-margin-top">
+      Iniciar Sesión
+    </ion-button>
+  </form>
+
+  <ion-text color="danger" *ngIf="errorMessage">
+    <p class="ion-text-center">{{ errorMessage }}</p>
+  </ion-text>
+
+  <ion-button expand="block" color="warning" (click)="loginAsAdmin()" class="ion-margin-top">
+    Acceso rápido: Administrador
+  </ion-button>
+
+  <ion-button expand="block" color="tertiary" (click)="loginAsUser()">
+    Acceso rápido: Usuario Estándar
+  </ion-button>
+
+  <ion-button expand="block" fill="clear" (click)="goToRegister()">
+    ¿No tienes cuenta? Regístrate
+  </ion-button>
+</ion-content>
+
+
