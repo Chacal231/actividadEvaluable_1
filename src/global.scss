@@ -1,12 +1,6 @@
 /*
- * App Global CSS
+ * App Global CSS - Enterprise SaaS Theme
  * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
  */
 
 /* Core CSS required for Ionic components to work properly */
@@ -28,10 +22,83 @@
 /**
  * Ionic Dark Mode
  * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
  */
-
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+:root {
+  /* Enterprise Design System Variables */
+  --app-border-radius-sm: 12px;
+  --app-border-radius-md: 16px;
+  --app-border-radius-lg: 20px;
+  --app-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --app-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --app-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --app-shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.2);
+  
+  /* Spacing */
+  --app-spacing-xs: 4px;
+  --app-spacing-sm: 8px;
+  --app-spacing-md: 16px;
+  --app-spacing-lg: 24px;
+  --app-spacing-xl: 32px;
+}
+
+/* Global Accessibility Improvements */
+*:focus-visible {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}
+
+ion-button:focus-visible,
+ion-item:focus-visible,
+ion-card:focus-visible {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}
+
+/* Ensure sufficient contrast for text */
+ion-label,
+ion-text,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--ion-text-color);
+}
+
+/* Smooth transitions */
+ion-card,
+ion-button,
+ion-item {
+  transition: all 0.2s ease-in-out;
+}
+
+ion-card:hover {
+  box-shadow: var(--app-shadow-md);
+}
+
+/* Mobile-first responsive utilities */
+@media (max-width: 767px) {
+  ion-content {
+    --padding-start: var(--app-spacing-md);
+    --padding-end: var(--app-spacing-md);
+  }
+}
+
+@media (min-width: 768px) {
+  ion-content {
+    --padding-start: var(--app-spacing-lg);
+    --padding-end: var(--app-spacing-lg);
+  }
+}
+
+@media (min-width: 1024px) {
+  ion-content {
+    --padding-start: var(--app-spacing-xl);
+    --padding-end: var(--app-spacing-xl);
+  }
+}
+

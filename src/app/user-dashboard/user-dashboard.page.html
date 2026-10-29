@@ -1,27 +1,117 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Panel de Usuario</ion-title>
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar class="dashboard-header">
+    <ion-buttons slot="start">
+      <ion-menu-button aria-label="Abrir menú de navegación"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Dashboard - Usuario</ion-title>
+    <ion-buttons slot="end">
+      <ion-badge color="primary" class="role-badge-header" aria-label="Rol actual: Usuario">
+        User
+      </ion-badge>
+      <ion-avatar class="user-avatar" aria-label="Avatar de perfil">
+        <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Avatar" />
+      </ion-avatar>
+      <ion-button fill="clear" (click)="logout()" aria-label="Cerrar sesión">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-header collapse="condense">
+<ion-content [fullscreen]="true" class="dashboard-content">
+  <ion-header collapse="condense" class="ion-no-border">
     <ion-toolbar>
-      <ion-title size="large">Panel de Usuario</ion-title>
+      <ion-title size="large">Dashboard - Usuario</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Bienvenido Usuario</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      Esta es la página para usuarios estándar y también accesible para administradores.
-    </ion-card-content>
-  </ion-card>
+  <div class="dashboard-container ion-padding">
+    <h2 class="section-title">Mi Dashboard</h2>
 
-  <ion-button expand="block" color="danger" (click)="logout()" class="ion-margin-top">
-    Cerrar Sesión
-  </ion-button>
+    <ion-text color="danger" *ngIf="errorMessage()">
+      <p class="error-message">{{ errorMessage() }}</p>
+    </ion-text>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-sm="6" size-lg="3" *ngFor="let metric of metrics(); let i = index">
+          <app-stat-card
+            [title]="metric.label"
+            [value]="metric.value"
+            [icon]="getMetricIcon(i)"
+            [color]="getMetricColor(i)"
+            trend="Actualizado desde Supabase"
+            trendDirection="neutral"
+            [loading]="isLoading()"
+          ></app-stat-card>
+        </ion-col>
+
+        <ng-container *ngIf="isLoading()">
+          <ion-col size="12" size-sm="6" size-lg="3">
+            <app-stat-card title="" value="" icon="" color="primary" [loading]="true"></app-stat-card>
+          </ion-col>
+          <ion-col size="12" size-sm="6" size-lg="3">
+            <app-stat-card title="" value="" icon="" color="success" [loading]="true"></app-stat-card>
+          </ion-col>
+          <ion-col size="12" size-sm="6" size-lg="3">
+            <app-stat-card title="" value="" icon="" color="warning" [loading]="true"></app-stat-card>
+          </ion-col>
+          <ion-col size="12" size-sm="6" size-lg="3">
+            <app-stat-card title="" value="" icon="" color="tertiary" [loading]="true"></app-stat-card>
+          </ion-col>
+        </ng-container>
+      </ion-row>
+    </ion-grid>
+
+    <ion-card class="welcome-card">
+      <ion-card-header>
+        <ion-card-title>Datos de la Base de Datos</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none" *ngIf="!isLoading() && metrics().length > 0">
+          <ion-item *ngFor="let metric of metrics()">
+            <ion-label>{{ metric.label }}</ion-label>
+            <ion-label slot="end" class="metric-value">{{ metric.value }}</ion-label>
+          </ion-item>
+        </ion-list>
+
+        <div *ngIf="isLoading()">
+          <ion-item lines="none" *ngFor="let i of [1, 2, 3, 4]">
+            <ion-label>
+              <ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text>
+            </ion-label>
+            <ion-label slot="end">
+              <ion-skeleton-text [animated]="true" style="width: 40px"></ion-skeleton-text>
+            </ion-label>
+          </ion-item>
+        </div>
+
+        <p *ngIf="!isLoading() && metrics().length === 0 && !errorMessage()" class="note">
+          No hay datos disponibles en este momento.
+        </p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      color="primary"
+      class="ion-margin-top"
+      (click)="loadMetrics()"
+      aria-label="Recargar datos del dashboard"
+    >
+      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+      Recargar Datos
+    </ion-button>
+
+    <ion-card class="welcome-card">
+      <ion-card-header>
+        <ion-card-title>Bienvenido</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>Esta es tu área personal. Los datos mostrados se obtienen en tiempo real de la base de datos.</p>
+        <p class="note">Los usuarios estándar tienen acceso a este panel. Los administradores también pueden acceder a él.</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
-

@@ -1,12 +1,26 @@
-<ion-card [color]="color" class="stat-card">
-  <ion-card-header class="stat-card-header">
-    <div class="stat-card-content">
-      <ion-icon *ngIf="icon" [name]="icon" class="stat-card-icon"></ion-icon>
-      <div class="stat-card-text">
-        <ion-card-title class="stat-card-title">{{ title }}</ion-card-title>
-        <div class="stat-card-value">{{ value }}</div>
+<ion-card class="stat-card" [attr.aria-label]="'Estadística: ' + title + ' ' + value">
+  <div class="stat-card-body">
+    <div class="stat-card-header-row">
+      <div class="stat-card-icon-wrapper" [ngClass]="'icon-bg-' + color">
+        <ion-icon *ngIf="icon && !loading" [name]="icon" class="stat-card-icon" [attr.aria-hidden]="true"></ion-icon>
+        <ion-skeleton-text *ngIf="loading" [animated]="true" class="icon-skeleton"></ion-skeleton-text>
       </div>
     </div>
-  </ion-card-header>
+    <div class="stat-card-content">
+      <div class="stat-card-title">{{ title }}</div>
+      <div class="stat-card-value" *ngIf="!loading">{{ value }}</div>
+      <ion-skeleton-text *ngIf="loading" [animated]="true" class="value-skeleton"></ion-skeleton-text>
+      <div class="stat-card-trend" *ngIf="trend && !loading" [ngClass]="trendDirection">
+        <ion-icon
+          [name]="trendDirection === 'up' ? 'arrow-up-outline' : trendDirection === 'down' ? 'arrow-down-outline' : 'remove-outline'"
+          class="trend-icon"
+          [attr.aria-hidden]="true"
+        ></ion-icon>
+        <span>{{ trend }}</span>
+      </div>
+      <ion-skeleton-text *ngIf="loading && trend" [animated]="true" class="trend-skeleton"></ion-skeleton-text>
+    </div>
+  </div>
 </ion-card>
+
 

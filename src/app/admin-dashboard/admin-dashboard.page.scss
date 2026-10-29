@@ -1,12 +1,123 @@
+.dashboard-header {
+  --background: var(--ion-toolbar-background);
+  --border-color: var(--ion-color-light-shade);
+}
+
+.role-badge-header {
+  margin-right: 8px;
+  font-size: 11px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  margin-right: 8px;
+}
+
+.dashboard-content {
+  --background: var(--ion-color-light);
+}
+
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
 .section-title {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 24px 0 16px 0;
+  color: var(--ion-text-color);
+  letter-spacing: -0.5px;
+}
+
+.chart-card {
+  border-radius: var(--app-border-radius-md);
+  box-shadow: var(--app-shadow-sm);
+  margin: 16px 0;
+}
+
+.chart-card ion-card-title {
+  font-size: 18px;
   font-weight: 600;
-  margin: 16px 0 12px 0;
-  color: var(--ion-color-dark);
+}
+
+.chart-container-mixed {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  max-height: 400px;
+}
+
+.chart-skeleton {
+  height: 320px;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 20px;
+}
+
+.skeleton-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+}
+
+.skeleton-bar {
+  flex: 1;
+  background: var(--ion-color-light-shade);
+  border-radius: 4px 4px 0 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-bar:nth-child(1) { height: 60%; }
+.skeleton-bar:nth-child(2) { height: 75%; animation-delay: 0.1s; }
+.skeleton-bar:nth-child(3) { height: 90%; animation-delay: 0.2s; }
+.skeleton-bar:nth-child(4) { height: 85%; animation-delay: 0.3s; }
+.skeleton-bar:nth-child(5) { height: 65%; animation-delay: 0.4s; }
+.skeleton-bar:nth-child(6) { height: 95%; animation-delay: 0.5s; }
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.export-section {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 @media (min-width: 768px) {
   .section-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
+  }
+
+  .chart-container-mixed {
+    height: 400px;
+  }
+
+  .chart-skeleton {
+    height: 400px;
+  }
+}
+
+@media (max-width: 576px) {
+  .role-badge-header {
+    display: none;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
   }
 }

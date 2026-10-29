@@ -1,22 +1,63 @@
 .data-table-container {
   width: 100%;
+  background: var(--ion-card-background);
+  border-radius: var(--app-border-radius-md);
+  box-shadow: var(--app-shadow-sm);
+  overflow: hidden;
+}
+
+.table-filters {
+  padding: 12px 16px;
+  background: var(--ion-color-light);
+  border-bottom: 1px solid var(--ion-color-light-shade);
+}
+
+.table-searchbar {
+  padding: 0;
+  --background: var(--ion-background-color);
+  --border-radius: var(--app-border-radius-sm);
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.filter-item {
+  --background: var(--ion-background-color);
+  --border-radius: var(--app-border-radius-sm);
+  flex: 1;
+  min-width: 150px;
+  max-width: 200px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ion-color-medium);
+  margin-bottom: 4px;
 }
 
 .data-table-header {
   background: var(--ion-color-light);
-  border-radius: 8px 8px 0 0;
-  padding: 8px 0;
+  padding: 12px 0;
   display: none;
 }
 
 .header-col {
   text-align: left;
-  font-size: 14px;
+  font-size: 13px;
   padding: 8px 16px;
+  color: var(--ion-color-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .data-table-list {
   padding: 0;
+  background: transparent;
 }
 
 .data-table-row {
@@ -32,13 +73,28 @@
 
 .data-col {
   font-size: 14px;
-  padding: 12px 16px;
+  padding: 14px 16px;
   word-break: break-word;
 }
 
 .no-data {
   text-align: center;
-  padding: 32px;
+  padding: 48px 32px;
+  color: var(--ion-color-medium);
+}
+
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--ion-color-light);
+  border-top: 1px solid var(--ion-color-light-shade);
+}
+
+.pagination-info {
+  font-size: 13px;
   color: var(--ion-color-medium);
 }
 
@@ -52,7 +108,7 @@
   }
 
   .data-col {
-    font-size: 15px;
+    font-size: 14px;
   }
 }
 
@@ -77,6 +133,14 @@
   .data-table-row ion-col:first-child {
     font-weight: 600;
     font-size: 15px;
-    padding-top: 12px;
+    padding-top: 14px;
+  }
+
+  .filter-row {
+    flex-direction: column;
+  }
+
+  .filter-item {
+    max-width: 100%;
   }
 }

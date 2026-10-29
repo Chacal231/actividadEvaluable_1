@@ -1,59 +1,88 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" class="ion-no-border">
   <ion-toolbar>
     <ion-title>Login</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-header collapse="condense">
+<ion-content [fullscreen]="true" class="login-content">
+  <ion-header collapse="condense" class="ion-no-border">
     <ion-toolbar>
       <ion-title size="large">Login</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-    <ion-item>
-      <ion-label position="floating">Email</ion-label>
-      <ion-input type="email" formControlName="email"></ion-input>
-    </ion-item>
-    <ion-note color="danger" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')">
-      El email es requerido
-    </ion-note>
-    <ion-note color="danger" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.hasError('email')">
-      Email con formato inválido
-    </ion-note>
+  <div class="login-container">
+    <div class="login-logo-section">
+      <ion-icon name="business-outline" class="login-logo-icon"></ion-icon>
+      <h1 class="login-app-title">Actividad Evaluable 1</h1>
+      <p class="login-app-subtitle">Gestión Empresarial</p>
+    </div>
 
-    <ion-item>
-      <ion-label position="floating">Contraseña</ion-label>
-      <ion-input type="password" formControlName="password"></ion-input>
-    </ion-item>
-    <ion-note color="danger" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')">
-      La contraseña es requerida
-    </ion-note>
-    <ion-note color="danger" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('minlength')">
-      Mínimo 6 caracteres
-    </ion-note>
+    <div class="login-card">
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <div class="input-group">
+          <ion-item lines="none" class="custom-input-item">
+            <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              type="email"
+              formControlName="email"
+              placeholder="Correo electrónico"
+              class="custom-input"
+            ></ion-input>
+          </ion-item>
+          <ion-note color="danger" class="error-note" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')">
+            El email es requerido
+          </ion-note>
+          <ion-note color="danger" class="error-note" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.hasError('email')">
+            Email con formato inválido
+          </ion-note>
+        </div>
 
-    <ion-button expand="block" type="submit" [disabled]="loginForm.invalid" class="ion-margin-top">
-      Iniciar Sesión
-    </ion-button>
-  </form>
+        <div class="input-group">
+          <ion-item lines="none" class="custom-input-item">
+            <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
+            <ion-input
+              type="password"
+              formControlName="password"
+              placeholder="Contraseña"
+              class="custom-input"
+            ></ion-input>
+          </ion-item>
+          <ion-note color="danger" class="error-note" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')">
+            La contraseña es requerida
+          </ion-note>
+          <ion-note color="danger" class="error-note" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('minlength')">
+            Mínimo 6 caracteres
+          </ion-note>
+        </div>
 
-  <ion-text color="danger" *ngIf="errorMessage">
-    <p class="ion-text-center">{{ errorMessage }}</p>
-  </ion-text>
+        <ion-button expand="block" type="submit" [disabled]="loginForm.invalid" class="login-button ion-margin-top">
+          Iniciar Sesión
+        </ion-button>
+      </form>
 
-  <ion-button expand="block" color="warning" (click)="loginAsAdmin()" class="ion-margin-top">
-    Acceso rápido: Administrador
-  </ion-button>
+      <ion-text color="danger" *ngIf="errorMessage">
+        <p class="ion-text-center error-message">{{ errorMessage }}</p>
+      </ion-text>
 
-  <ion-button expand="block" color="tertiary" (click)="loginAsUser()">
-    Acceso rápido: Usuario Estándar
-  </ion-button>
+      <div class="register-link-section">
+        <ion-button expand="block" fill="clear" (click)="goToRegister()" class="register-button">
+          ¿No tienes cuenta? <strong>Regístrate</strong>
+        </ion-button>
+      </div>
 
-  <ion-button expand="block" fill="clear" (click)="goToRegister()">
-    ¿No tienes cuenta? Regístrate
-  </ion-button>
+      <div class="quick-access-section">
+        <p class="quick-access-title">Acceso rápido para pruebas</p>
+        <ion-button expand="block" fill="outline" size="small" (click)="loginAsAdmin()" class="quick-access-button">
+          Acceso rápido: Administrador
+        </ion-button>
+        <ion-button expand="block" fill="outline" size="small" (click)="loginAsUser()" class="quick-access-button">
+          Acceso rápido: Usuario Estándar
+        </ion-button>
+      </div>
+    </div>
+  </div>
 </ion-content>
+
 
 

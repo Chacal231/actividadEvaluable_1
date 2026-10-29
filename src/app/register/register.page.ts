@@ -23,9 +23,11 @@ import {
   IonSelect,
   IonSelectOption,
   IonNote,
+  ToastController,
 } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AuthService, UserRole } from '../services/auth';
+import { SupabaseService } from '../services/supabase';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
@@ -75,7 +77,9 @@ export class RegisterPage {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private supabaseService: SupabaseService,
+    private toastController: ToastController
   ) {
     this.registerForm = this.formBuilder.group(
       {
@@ -107,7 +111,7 @@ export class RegisterPage {
     };
   }
 
-  onRegister() {
+  async onRegister() {
     if (this.registerForm.valid) {
       const { nombre, email, password, role } = this.registerForm.value as {
         nombre: string;
@@ -115,15 +119,48 @@ export class RegisterPage {
         password: string;
         role: UserRole;
       };
-      const success = this.authService.register(email, password, role, nombre);
-      if (success) {
+
+      try {
+        const { data, error } = await this.supabaseService.signUp(email, password);
+
+        if (error) {
+          const toast = await this.toastController.create({
+            message: error.message || 'Error al registrar usuario',
+            duration: 3000,
+            color: 'danger',
+            position: 'bottom',
+          });
+          await toast.present();
+          this.errorMessage = error.message;
+          this.successMessage = '';
+          return;
+        }
+
+        // También guardamos localmente para mantener compatibilidad con auth guard
+        this.authService.register(email, password, role, nombre);
+
+        const toast = await this.toastController.create({
+          message: 'Registro exitoso. Revisa tu correo para confirmar.',
+          duration: 3000,
+          color: 'success',
+          position: 'bottom',
+        });
+        await toast.present();
+
         this.successMessage = 'Registro exitoso. Puedes iniciar sesión.';
         this.errorMessage = '';
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 1500);
-      } else {
-        this.errorMessage = 'El usuario ya existe';
+      } catch (err: any) {
+        const toast = await this.toastController.create({
+          message: 'Error inesperado al registrarse',
+          duration: 3000,
+          color: 'danger',
+          position: 'bottom',
+        });
+        await toast.present();
+        this.errorMessage = 'Error inesperado al registrarse';
         this.successMessage = '';
       }
     } else {
@@ -135,5 +172,6 @@ export class RegisterPage {
     this.router.navigate(['/login']);
   }
 }
+
 
 

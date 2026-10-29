@@ -1,60 +1,134 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Panel de Administrador</ion-title>
+<ion-header [translucent]="true" class="ion-no-border">
+  <ion-toolbar class="dashboard-header">
+    <ion-buttons slot="start">
+      <ion-menu-button aria-label="Abrir menú de navegación"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Dashboard - Administración</ion-title>
+    <ion-buttons slot="end">
+      <ion-badge color="warning" class="role-badge-header" aria-label="Rol actual: Administrador">
+        Admin
+      </ion-badge>
+      <ion-avatar class="user-avatar" aria-label="Avatar de perfil">
+        <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Avatar" />
+      </ion-avatar>
+      <ion-button fill="clear" (click)="logout()" aria-label="Cerrar sesión">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-header collapse="condense">
+<ion-content [fullscreen]="true" class="dashboard-content">
+  <ion-header collapse="condense" class="ion-no-border">
     <ion-toolbar>
-      <ion-title size="large">Panel de Administrador</ion-title>
+      <ion-title size="large">Dashboard - Administración</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <h2 class="section-title">Estadísticas</h2>
-  <ion-grid>
-    <ion-row>
-      <ion-col size="12" size-md="4">
-        <app-stat-card
-          title="Usuarios Activos"
-          [value]="usuariosActivos"
-          icon="people-outline"
-          color="primary"
-        ></app-stat-card>
-      </ion-col>
-      <ion-col size="12" size-md="4">
-        <app-stat-card
-          title="Ingresos"
-          [value]="ingresos"
-          icon="cash-outline"
-          color="success"
-        ></app-stat-card>
-      </ion-col>
-      <ion-col size="12" size-md="4">
-        <app-stat-card
-          title="Transacciones"
-          [value]="transacciones"
-          icon="cart-outline"
-          color="warning"
-        ></app-stat-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <div id="admin-dashboard-content" class="dashboard-container">
+    <h2 class="section-title">Estadísticas</h2>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-sm="6" size-lg="3">
+          <app-stat-card
+            title="Usuarios Activos"
+            [value]="usuariosActivos"
+            icon="people-outline"
+            color="primary"
+            trend="+14% vs mes anterior"
+            trendDirection="up"
+            [loading]="isLoading()"
+          ></app-stat-card>
+        </ion-col>
+        <ion-col size="12" size-sm="6" size-lg="3">
+          <app-stat-card
+            title="Ingresos"
+            [value]="ingresos"
+            icon="cash-outline"
+            color="success"
+            trend="+18% vs mes anterior"
+            trendDirection="up"
+            [loading]="isLoading()"
+          ></app-stat-card>
+        </ion-col>
+        <ion-col size="12" size-sm="6" size-lg="3">
+          <app-stat-card
+            title="Transacciones"
+            [value]="transacciones"
+            icon="cart-outline"
+            color="warning"
+            trend="+8% vs mes anterior"
+            trendDirection="up"
+            [loading]="isLoading()"
+          ></app-stat-card>
+        </ion-col>
+        <ion-col size="12" size-sm="6" size-lg="3">
+          <app-stat-card
+            title="Productos"
+            [value]="productos"
+            icon="cube-outline"
+            color="tertiary"
+            trend="-3% vs mes anterior"
+            trendDirection="down"
+            [loading]="isLoading()"
+          ></app-stat-card>
 
-  <h2 class="section-title ion-margin-top">Lista de Usuarios</h2>
-  <app-data-table
-    [data]="usuarios"
-    [columns]="columns"
-    (rowSelected)="onRowSelected($event)"
-  ></app-data-table>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
 
-  <ion-button expand="block" color="medium" (click)="mostrarToast()" class="ion-margin-top">
-    Actualizar Datos
-  </ion-button>
+    <h2 class="section-title ion-margin-top">Análisis de Rendimiento</h2>
+    <ion-card class="chart-card">
+      <ion-card-header>
+        <ion-card-title>Gráfico Mixto - Ventas e Ingresos</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="chart-container-mixed" *ngIf="!isLoading()">
+          <canvas #mixedChart></canvas>
+        </div>
+        <div class="chart-skeleton" *ngIf="isLoading()">
+          <div class="skeleton-bars">
+            <div class="skeleton-bar" *ngFor="let i of [1,2,3,4,5,6]"></div>
+          </div>
+        </div>
+      </ion-card-content>
 
-  <ion-button expand="block" color="danger" (click)="logout()" class="ion-margin-top">
-    Cerrar Sesión
-  </ion-button>
+    </ion-card>
+
+    <h2 class="section-title ion-margin-top">Gestión de Usuarios</h2>
+    <app-data-table
+      [data]="usuarios"
+      [columns]="columns"
+      [filterableFields]="filterableFields"
+      (rowSelected)="onRowSelected($event)"
+    ></app-data-table>
+  </div>
+
+  <div class="export-section ion-margin-top">
+    <h2 class="section-title">Informes y Exportación</h2>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-button expand="block" color="primary" (click)="exportPDF()" aria-label="Exportar informe a PDF">
+            <ion-icon name="download-outline" slot="start"></ion-icon>
+            Exportar Informe PDF
+          </ion-button>
+        </ion-col>
+        <ion-col size="12" size-md="6">
+          <ion-button expand="block" color="secondary" (click)="exportCSV()" aria-label="Exportar datos a CSV">
+            <ion-icon name="document-text-outline" slot="start"></ion-icon>
+            Exportar Datos CSV
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ion-button expand="block" fill="outline" color="medium" (click)="mostrarToast()" class="ion-margin-top" aria-label="Actualizar datos del dashboard">
+      Actualizar Datos
+    </ion-button>
+  </div>
 </ion-content>
+
+
 
 

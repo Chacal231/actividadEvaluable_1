@@ -1,0 +1,87 @@
+.dashboard-header {
+  --background: var(--ion-toolbar-background);
+  --border-color: var(--ion-color-light-shade);
+}
+
+.role-badge-header {
+  margin-right: 8px;
+  font-size: 11px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  margin-right: 8px;
+}
+
+.dashboard-content {
+  --background: var(--ion-color-light);
+}
+
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 24px 0 16px 0;
+  color: var(--ion-text-color);
+  letter-spacing: -0.5px;
+}
+
+.welcome-card {
+  border-radius: var(--app-border-radius-md);
+  box-shadow: var(--app-shadow-sm);
+  margin-top: 24px;
+}
+
+.welcome-card ion-card-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.welcome-card p {
+  color: var(--ion-text-color);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.welcome-card .note {
+  font-size: 13px;
+  color: var(--ion-color-medium);
+  font-style: italic;
+}
+
+.error-message {
+  font-size: 14px;
+  margin: 8px 0 16px 0;
+}
+
+.metric-value {
+  font-weight: 700;
+  color: var(--ion-color-primary);
+  text-align: right;
+}
+
+@media (min-width: 768px) {
+  .section-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .role-badge-header {
+    display: none;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+  }
+}

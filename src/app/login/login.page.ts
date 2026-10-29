@@ -13,11 +13,11 @@ import {
   IonTitle,
   IonContent,
   IonItem,
-  IonLabel,
   IonInput,
   IonButton,
   IonText,
   IonNote,
+  IonIcon,
 } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth';
@@ -33,16 +33,17 @@ import { AuthService } from '../services/auth';
     IonTitle,
     IonContent,
     IonItem,
-    IonLabel,
     IonInput,
     IonButton,
     IonText,
     IonNote,
+    IonIcon,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
   ],
 })
+
 export class LoginPage {
   loginForm: FormGroup;
   errorMessage: string = '';
@@ -81,7 +82,7 @@ export class LoginPage {
     this.authService.logout();
     const success = this.authService.login('admin@ionic.com', 'admin123');
     if (success) {
-      this.router.navigate(['/admin-dashboard']);
+      this.router.navigateByUrl('/admin-dashboard');
     }
   }
 
@@ -89,9 +90,10 @@ export class LoginPage {
     this.authService.logout();
     const success = this.authService.login('user@ionic.com', 'user123');
     if (success) {
-      this.router.navigate(['/user-dashboard']);
+      this.router.navigateByUrl('/user-dashboard');
     }
   }
+
 
   goToRegister() {
     this.router.navigate(['/register']);
