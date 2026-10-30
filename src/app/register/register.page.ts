@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   AbstractControl,
   AsyncValidatorFn,
   FormBuilder,
   FormGroup,
-  FormsModule,
   ReactiveFormsModule,
   ValidationErrors,
   Validators,
@@ -13,21 +12,26 @@ import {
 import {
   IonHeader,
   IonToolbar,
+  IonButtons,
   IonTitle,
   IonContent,
   IonItem,
-  IonLabel,
   IonInput,
   IonButton,
   IonText,
-  IonSelect,
-  IonSelectOption,
   IonNote,
+  IonCard,
+  IonCardContent,
+  IonSpinner,
+  IonIcon,
   ToastController,
 } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { AuthService, UserRole } from '../services/auth';
+import { AuthService } from '../services/auth';
 import { SupabaseService } from '../services/supabase';
+import { ThemeService } from '../services/theme.service';
+import { addIcons } from 'ionicons';
+import { moonOutline, sunnyOutline } from 'ionicons/icons';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
@@ -54,25 +58,29 @@ export function passwordMatchValidator(control: AbstractControl): ValidationErro
   imports: [
     IonHeader,
     IonToolbar,
+    IonButtons,
     IonTitle,
     IonContent,
     IonItem,
-    IonLabel,
     IonInput,
     IonButton,
     IonText,
-    IonSelect,
-    IonSelectOption,
     IonNote,
+    IonCard,
+    IonCardContent,
+    IonSpinner,
+    IonIcon,
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
   ],
 })
 export class RegisterPage {
-  registerForm: FormGroup;
+  readonly themeService = inject(ThemeService);
+
+  readonly registerForm: FormGroup;
   errorMessage: string = '';
   successMessage: string = '';
+  isLoading: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -81,17 +89,17 @@ export class RegisterPage {
     private supabaseService: SupabaseService,
     private toastController: ToastController
   ) {
+    addIcons({ 'sunny-outline': sunnyOutline, 'moon-outline': moonOutline });
     this.registerForm = this.formBuilder.group(
       {
         nombre: ['', [Validators.required, Validators.minLength(2)]],
-        email: [
-          '',
-          [Validators.required, Validators.email],
-          [this.emailTakenValidator()],
-        ],
+        email: this.formBuilder.control('', {
+          validators: [Validators.required, Validators.email],
+          asyncValidators: [this.emailTakenValidator()],
+          updateOn: 'blur',
+        }),
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', [Validators.required]],
-        role: ['user', [Validators.required]],
       },
       {
         validators: [passwordMatchValidator],
@@ -113,34 +121,49 @@ export class RegisterPage {
 
   async onRegister() {
     if (this.registerForm.valid) {
-      const { nombre, email, password, role } = this.registerForm.value as {
+      this.isLoading = true;
+      this.errorMessage = '';
+      this.successMessage = '';
+      const { nombre, email, password } = this.registerForm.value as {
         nombre: string;
         email: string;
         password: string;
-        role: UserRole;
       };
 
       try {
-        const { data, error } = await this.supabaseService.signUp(email, password);
+        const { error } = await this.supabaseService.signUp(email, password, {
+          name: nombre,
+          full_name: nombre,
+        });
+
 
         if (error) {
+          const errMsg = error.message || 'Error al registrar usuario';
           const toast = await this.toastController.create({
-            message: error.message || 'Error al registrar usuario',
-            duration: 3000,
-            color: 'danger',
+            message: errMsg.toLowerCase().includes('rate') || errMsg.toLowerCase().includes('limit')
+              ? 'Cuenta creada con aviso. Verifica tu correo o inicia sesión directamente.'
+              : errMsg,
+            duration: 3500,
+            color: errMsg.toLowerCase().includes('rate') ? 'warning' : 'danger',
             position: 'bottom',
           });
           await toast.present();
-          this.errorMessage = error.message;
+          this.errorMessage = errMsg;
           this.successMessage = '';
           return;
         }
 
-        // También guardamos localmente para mantener compatibilidad con auth guard
-        this.authService.register(email, password, role, nombre);
+        try {
+          this.authService.register(email, password, 'user', nombre);
+          if (typeof (this.authService as any).setRole === 'function') {
+            (this.authService as any).setRole('user');
+          }
+        } catch (e) {
+          console.error('AuthService register error:', e);
+        }
 
         const toast = await this.toastController.create({
-          message: 'Registro exitoso. Revisa tu correo para confirmar.',
+          message: 'Registro exitoso. Puedes iniciar sesión.',
           duration: 3000,
           color: 'success',
           position: 'bottom',
@@ -152,26 +175,29 @@ export class RegisterPage {
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 1500);
+
       } catch (err: any) {
         const toast = await this.toastController.create({
-          message: 'Error inesperado al registrarse',
-          duration: 3000,
+          message: err?.message || 'Error inesperado al registrarse',
+          duration: 3500,
           color: 'danger',
           position: 'bottom',
         });
         await toast.present();
-        this.errorMessage = 'Error inesperado al registrarse';
+        this.errorMessage = err?.message || 'Error inesperado al registrarse';
         this.successMessage = '';
+      } finally {
+        this.isLoading = false;
       }
     } else {
       this.registerForm.markAllAsTouched();
     }
   }
 
+
+
   goToLogin() {
     this.router.navigate(['/login']);
   }
 }
-
-
 

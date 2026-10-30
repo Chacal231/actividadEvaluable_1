@@ -23,9 +23,32 @@
  * Ionic Dark Mode
  * -----------------------------------------------------
  */
-@import '@ionic/angular/css/palettes/dark.system.css';
+@import '@ionic/angular/css/palettes/dark.class.css';
 
 :root {
+  color-scheme: light;
+  --app-auth-background: linear-gradient(135deg, #f5f7fb 0%, #e8eef8 50%, #f5f7fb 100%);
+  --app-auth-surface: #ffffff;
+  --app-auth-input: #f5f7fb;
+  --app-auth-text: #172033;
+  --app-auth-muted: #526078;
+  --app-auth-border: #cbd5e1;
+  --ion-background-color: #f5f7fb;
+  --ion-background-color-rgb: 245, 247, 251;
+  --ion-text-color: #172033;
+  --ion-text-color-rgb: 23, 32, 51;
+  --ion-card-background: #ffffff;
+  --ion-item-background: #ffffff;
+  --ion-toolbar-background: #ffffff;
+  --ion-color-light: #edf1f7;
+  --ion-color-light-rgb: 237, 241, 247;
+  --ion-color-light-shade: #d1d8e2;
+  --ion-color-dark: #172033;
+  --ion-color-dark-rgb: 23, 32, 51;
+  --ion-color-medium: #526078;
+  --ion-color-medium-rgb: 82, 96, 120;
+  --ion-color-medium-shade: #47546a;
+
   /* Enterprise Design System Variables */
   --app-border-radius-sm: 12px;
   --app-border-radius-md: 16px;
@@ -41,6 +64,84 @@
   --app-spacing-md: 16px;
   --app-spacing-lg: 24px;
   --app-spacing-xl: 32px;
+}
+
+html:not(.dark) {
+  color-scheme: light;
+  --ion-background-color: #f4f5f8;
+  --ion-background-color-rgb: 244, 245, 248;
+  --ion-text-color: #1e1e1e;
+  --ion-text-color-rgb: 30, 30, 30;
+  --ion-card-background: #ffffff;
+  --ion-item-background: #ffffff;
+  --ion-toolbar-background: #ffffff;
+  --ion-color-dark: #222428;
+  --ion-color-dark-rgb: 34, 36, 40;
+}
+
+html.ion-palette-dark,
+body.ion-palette-dark {
+  color-scheme: dark;
+}
+
+html[data-theme='dark'] {
+  --app-auth-background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  --app-auth-surface: #1e293b;
+  --app-auth-input: #0f172a;
+  --app-auth-text: #e2e8f0;
+  --app-auth-muted: #94a3b8;
+  --app-auth-border: rgba(148, 163, 184, 0.35);
+}
+
+ion-header ion-toolbar {
+  --background: var(--ion-toolbar-background);
+  --color: var(--ion-text-color);
+}
+
+html:not(.dark) ion-content {
+  --background: #f4f5f8;
+  --color: #222428;
+}
+
+html:not(.dark) ion-card,
+html:not(.dark) .custom-card,
+html:not(.dark) .data-table-container,
+html:not(.dark) .data-table-row {
+  --background: #ffffff;
+  --color: #1e1e1e;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+}
+
+html:not(.dark) ion-card-title,
+html:not(.dark) h1,
+html:not(.dark) h2,
+html:not(.dark) h3,
+html:not(.dark) p,
+html:not(.dark) .data-table-row td,
+html:not(.dark) .data-table-row ion-label {
+  color: #222428;
+}
+
+.theme-toggle-button {
+  --color: var(--ion-color-primary);
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 20px;
+}
+
+ion-card {
+  --background: var(--ion-card-background);
+  --color: var(--ion-text-color);
+  color: var(--ion-text-color);
+}
+
+ion-card ion-card-title,
+ion-card ion-card-subtitle,
+ion-card ion-card-content,
+ion-card p,
+ion-card strong {
+  color: var(--ion-text-color);
 }
 
 /* Global Accessibility Improvements */
@@ -101,4 +202,3 @@ ion-card:hover {
     --padding-end: var(--app-spacing-xl);
   }
 }
-

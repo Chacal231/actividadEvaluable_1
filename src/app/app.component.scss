@@ -1,0 +1,63 @@
+.menu-header-toolbar {
+  --background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-secondary) 100%);
+  --color: white;
+}
+
+.menu-header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.menu-logo-icon {
+  font-size: 32px;
+}
+
+.menu-title {
+  font-size: 18px;
+  font-weight: 600;
+  padding: 0;
+}
+
+.menu-content {
+  --background: var(--ion-background-color);
+}
+
+.menu-role-section {
+  padding: 16px;
+  border-bottom: 1px solid var(--ion-color-light-shade);
+}
+
+.role-badge {
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.menu-list {
+  padding: 8px 0;
+  background: transparent;
+}
+
+.menu-item {
+  --background: transparent;
+  --border-radius: var(--app-border-radius-sm);
+  margin: 4px 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+}
+
+.menu-item:hover {
+  --background: var(--ion-color-light);
+}
+
+.menu-item-icon {
+  color: var(--ion-color-primary);
+  font-size: 22px;
+  margin-right: 12px;
+}
+
+.menu-item-label {
+  font-size: 15px;
+  font-weight: 500;
+}

@@ -14,6 +14,18 @@
   margin-right: 8px;
 }
 
+.theme-toggle-button {
+  --color: var(--ion-text-color);
+  --border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  margin-inline: 4px;
+}
+
+.theme-toggle-button ion-icon {
+  font-size: 22px;
+}
+
 .dashboard-content {
   --background: var(--ion-color-light);
 }
@@ -21,6 +33,23 @@
 .dashboard-container {
   max-width: 1400px;
   margin: 0 auto;
+}
+
+.dashboard-segment {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  max-width: 1400px;
+  margin: 12px auto 0;
+  padding: 0 16px;
+  background: var(--ion-background-color);
+  --background: var(--ion-card-background);
+  border-radius: var(--app-border-radius-md);
+}
+
+.dashboard-segment ion-segment-button {
+  min-height: 56px;
+  text-transform: none;
 }
 
 .section-title {
@@ -65,6 +94,40 @@
   text-align: right;
 }
 
+.activity-card {
+  border-radius: var(--app-border-radius-md);
+  box-shadow: var(--app-shadow-sm);
+}
+
+.activity-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ion-color-light-shade);
+}
+
+.activity-row:last-child {
+  border-bottom: 0;
+}
+
+.activity-row > ion-icon {
+  font-size: 22px;
+}
+
+.activity-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.activity-copy span,
+.empty-activities {
+  color: var(--ion-color-medium);
+  font-size: 13px;
+}
+
 @media (min-width: 768px) {
   .section-title {
     font-size: 2rem;
@@ -83,5 +146,9 @@
 
   .section-title {
     font-size: 1.4rem;
+  }
+
+  .dashboard-segment ion-segment-button {
+    font-size: 12px;
   }
 }

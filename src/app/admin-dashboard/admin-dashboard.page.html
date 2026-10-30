@@ -11,6 +11,15 @@
       <ion-avatar class="user-avatar" aria-label="Avatar de perfil">
         <img src="https://ionicframework.com/docs/img/demos/avatar.svg" alt="Avatar" />
       </ion-avatar>
+      <ion-button
+        fill="clear"
+        (click)="themeService.toggleTheme()"
+        [attr.aria-label]="themeService.themeLabel()"
+        [title]="themeService.themeLabel()"
+        class="theme-toggle-button"
+      >
+        <ion-icon slot="icon-only" [name]="themeService.isDark() ? 'sunny-outline' : 'moon-outline'"></ion-icon>
+      </ion-button>
       <ion-button fill="clear" (click)="logout()" aria-label="Cerrar sesión">
         <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
@@ -25,57 +34,53 @@
     </ion-toolbar>
   </ion-header>
 
+  <ion-segment
+    class="dashboard-segment"
+    [value]="activeTab()"
+    (ionChange)="selectTab($event.detail.value)"
+    scrollable="true"
+    aria-label="Secciones del panel de administración"
+  >
+    <ion-segment-button value="overview">
+      <ion-icon name="stats-chart-outline"></ion-icon>
+      <ion-label>Resumen y Estadísticas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="users">
+      <ion-icon name="people-outline"></ion-icon>
+      <ion-label>Gestión de Usuarios</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="activity">
+      <ion-icon name="clipboard-outline"></ion-icon>
+      <ion-label>Auditoría y Actividad</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
   <div id="admin-dashboard-content" class="dashboard-container">
+    <ng-container *ngIf="activeTab() === 'overview'">
     <h2 class="section-title">Estadísticas</h2>
     <ion-grid>
       <ion-row>
-        <ion-col size="12" size-sm="6" size-lg="3">
+        <ion-col size="12" size-sm="6" size-lg="3" *ngFor="let metric of statsMetrics()">
           <app-stat-card
-            title="Usuarios Activos"
-            [value]="usuariosActivos"
-            icon="people-outline"
-            color="primary"
-            trend="+14% vs mes anterior"
-            trendDirection="up"
+            [title]="(metric.title || metric.label) || ''"
+            [value]="metric.value ?? 0"
+            [icon]="metric.icon || getMetricIcon(metric.title || metric.label || '')"
+            [color]="metric.color || getMetricColor(metric.title || metric.label || '')"
+            [trend]="metric.change_text || metric.trend || ''"
+            [trendDirection]="metric.is_positive === false || metric.trend_direction === 'down' ? 'down' : (metric.is_positive === true || metric.trend_direction === 'up' ? 'up' : (metric.trend_direction || 'neutral'))"
             [loading]="isLoading()"
           ></app-stat-card>
         </ion-col>
-        <ion-col size="12" size-sm="6" size-lg="3">
-          <app-stat-card
-            title="Ingresos"
-            [value]="ingresos"
-            icon="cash-outline"
-            color="success"
-            trend="+18% vs mes anterior"
-            trendDirection="up"
-            [loading]="isLoading()"
-          ></app-stat-card>
-        </ion-col>
-        <ion-col size="12" size-sm="6" size-lg="3">
-          <app-stat-card
-            title="Transacciones"
-            [value]="transacciones"
-            icon="cart-outline"
-            color="warning"
-            trend="+8% vs mes anterior"
-            trendDirection="up"
-            [loading]="isLoading()"
-          ></app-stat-card>
-        </ion-col>
-        <ion-col size="12" size-sm="6" size-lg="3">
-          <app-stat-card
-            title="Productos"
-            [value]="productos"
-            icon="cube-outline"
-            color="tertiary"
-            trend="-3% vs mes anterior"
-            trendDirection="down"
-            [loading]="isLoading()"
-          ></app-stat-card>
 
-        </ion-col>
+        <ng-container *ngIf="isLoading() && statsMetrics().length === 0">
+          <ion-col size="12" size-sm="6" size-lg="3" *ngFor="let i of [1,2,3,4]">
+            <app-stat-card title="" value="" icon="" color="primary" [loading]="true"></app-stat-card>
+          </ion-col>
+        </ng-container>
       </ion-row>
     </ion-grid>
+
+
 
     <h2 class="section-title ion-margin-top">Análisis de Rendimiento</h2>
     <ion-card class="chart-card">
@@ -87,48 +92,70 @@
           <canvas #mixedChart></canvas>
         </div>
         <div class="chart-skeleton" *ngIf="isLoading()">
-          <div class="skeleton-bars">
-            <div class="skeleton-bar" *ngFor="let i of [1,2,3,4,5,6]"></div>
-          </div>
+          <ion-spinner name="crescent" color="primary"></ion-spinner>
         </div>
       </ion-card-content>
 
     </ion-card>
 
-    <h2 class="section-title ion-margin-top">Gestión de Usuarios</h2>
+    <div class="export-section ion-margin-top">
+      <h2 class="section-title">Informes y Exportación</h2>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" size-md="6">
+            <ion-button expand="block" color="primary" (click)="exportPDF()" aria-label="Exportar informe a PDF">
+              <ion-icon name="download-outline" slot="start"></ion-icon>
+              Exportar Informe PDF
+            </ion-button>
+          </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-button expand="block" color="secondary" (click)="exportCSV()" aria-label="Exportar datos a CSV">
+              <ion-icon name="document-text-outline" slot="start"></ion-icon>
+              Exportar Datos CSV
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+    </ng-container>
+
+    <ng-container *ngIf="activeTab() === 'users'">
+    <div class="section-heading ion-margin-top">
+      <h2 class="section-title">Gestión de Usuarios</h2>
+      <ion-button fill="outline" color="primary" (click)="refreshData()" [disabled]="refreshing()">
+        <ion-spinner *ngIf="refreshing()" name="crescent" slot="start"></ion-spinner>
+        <ion-icon *ngIf="!refreshing()" name="refresh-outline" slot="start"></ion-icon>
+        {{ refreshing() ? 'Actualizando...' : 'Refrescar Datos' }}
+      </ion-button>
+    </div>
     <app-data-table
       [data]="usuarios"
       [columns]="columns"
       [filterableFields]="filterableFields"
+      [rowActions]="rowActions"
+      [actionLoadingKey]="activeActionKey()"
       (rowSelected)="onRowSelected($event)"
+      (actionSelected)="onUserAction($event)"
     ></app-data-table>
-  </div>
+    </ng-container>
 
-  <div class="export-section ion-margin-top">
-    <h2 class="section-title">Informes y Exportación</h2>
-    <ion-grid>
-      <ion-row>
-        <ion-col size="12" size-md="6">
-          <ion-button expand="block" color="primary" (click)="exportPDF()" aria-label="Exportar informe a PDF">
-            <ion-icon name="download-outline" slot="start"></ion-icon>
-            Exportar Informe PDF
-          </ion-button>
-        </ion-col>
-        <ion-col size="12" size-md="6">
-          <ion-button expand="block" color="secondary" (click)="exportCSV()" aria-label="Exportar datos a CSV">
-            <ion-icon name="document-text-outline" slot="start"></ion-icon>
-            Exportar Datos CSV
-          </ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-
-    <ion-button expand="block" fill="outline" color="medium" (click)="mostrarToast()" class="ion-margin-top" aria-label="Actualizar datos del dashboard">
-      Actualizar Datos
-    </ion-button>
+    <ng-container *ngIf="activeTab() === 'activity'">
+    <h2 class="section-title ion-margin-top">Actividad reciente</h2>
+    <ion-card class="activity-card">
+      <ion-card-content>
+        <div *ngIf="activities().length === 0" class="empty-activities">
+          Todavía no hay actividad registrada.
+        </div>
+        <div *ngFor="let activity of activities()" class="activity-row">
+          <ion-icon name="pulse-outline" color="primary"></ion-icon>
+          <div class="activity-copy">
+            <strong>{{ activity.action }}</strong>
+            <span>Usuario: {{ activity.user_label || activity.user_id }}</span>
+          </div>
+          <time>{{ activity.created_at | date: 'short' }}</time>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    </ng-container>
   </div>
 </ion-content>
-
-
-
-

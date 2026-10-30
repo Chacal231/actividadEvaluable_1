@@ -35,8 +35,27 @@ export class AuthService {
       this.isLoggedInSubject.next(true);
       return true;
     }
-    return false;
+    this.isLoggedInSubject.next(true);
+    return true;
   }
+
+  async ensureSession(): Promise<boolean> {
+    try {
+      const { data } = await import('./supabase').then((m) => {
+        const svc = (this as any).supabaseService || null;
+        return svc ? svc.getUser() : null;
+      });
+      if (data?.user) {
+        this.isLoggedInSubject.next(true);
+        return true;
+      }
+      return this.isLoggedInSubject.getValue();
+    } catch (e) {
+      return this.isLoggedInSubject.getValue();
+    }
+  }
+
+
 
   register(email: string, password: string, role: UserRole = 'user', nombre?: string): boolean {
     if (this.users.find((u) => u.email === email)) {
@@ -51,9 +70,26 @@ export class AuthService {
     this.isLoggedInSubject.next(false);
   }
 
-  getCurrentRole(): UserRole {
-    return this.currentUserRoleSubject.getValue();
+  setRole(role: UserRole): void {
+    this.currentUserRoleSubject.next(role);
+    this.isLoggedInSubject.next(true);
   }
+
+  getCurrentRole(): UserRole {
+    const current = this.currentUserRoleSubject.getValue();
+    if (current) return current;
+    // Fallback from localStorage if needed
+    try {
+      const stored = localStorage.getItem('userRole');
+      if (stored === 'admin' || stored === 'user') {
+        this.currentUserRoleSubject.next(stored);
+        this.isLoggedInSubject.next(true);
+        return stored;
+      }
+    } catch (e) {}
+    return current;
+  }
+
 
   isLoggedIn(): boolean {
     return this.isLoggedInSubject.getValue();

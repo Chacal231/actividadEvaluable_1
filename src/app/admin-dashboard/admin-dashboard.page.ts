@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, signal } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonHeader,
@@ -18,20 +18,30 @@ import {
   IonAvatar,
   IonButtons,
   IonMenuButton,
+  IonLabel,
   AlertController,
   ToastController,
+  IonSpinner,
+  IonSegment,
+  IonSegmentButton,
 } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth';
 import { StatCardComponent } from '../components/stat-card/stat-card.component';
 import { DataTableComponent } from '../components/data-table/data-table.component';
 import { ReportService } from '../services/report';
+import { DataService, UserActivity } from '../services/data';
+import { SupabaseService } from '../services/supabase';
+import { ThemeService } from '../services/theme.service';
+import { addIcons } from 'ionicons';
+import { moonOutline, sunnyOutline } from 'ionicons/icons';
 import { Chart, registerables } from 'chart.js';
+import { firstValueFrom } from 'rxjs';
 
 Chart.register(...registerables);
 
 interface UserTransaction {
-  id: number;
+  id: string;
   nombre: string;
   email: string;
   rol: string;
@@ -62,6 +72,10 @@ interface UserTransaction {
     IonAvatar,
     IonButtons,
     IonMenuButton,
+    IonLabel,
+    IonSpinner,
+    IonSegment,
+    IonSegmentButton,
     CommonModule,
     StatCardComponent,
     DataTableComponent,
@@ -71,17 +85,15 @@ interface UserTransaction {
 export class AdminDashboardPage implements OnInit {
   @ViewChild('mixedChart') mixedChart!: ElementRef<HTMLCanvasElement>;
 
-  usuariosActivos: number = 156;
-  ingresos: string = '$12,450';
-  transacciones: number = 89;
-  productos: number = 45;
-
-  usuarios: UserTransaction[] = [
-    { id: 1, nombre: 'Juan Pérez', email: 'juan@ionic.com', rol: 'user', fecha: '2024-01-15', estado: 'Activo' },
-    { id: 2, nombre: 'María García', email: 'maria@ionic.com', rol: 'admin', fecha: '2024-02-20', estado: 'Activo' },
-    { id: 3, nombre: 'Carlos López', email: 'carlos@ionic.com', rol: 'user', fecha: '2024-03-10', estado: 'Inactivo' },
-    { id: 4, nombre: 'Ana Martínez', email: 'ana@ionic.com', rol: 'user', fecha: '2024-03-25', estado: 'Activo' },
-    { id: 5, nombre: 'Pedro Sánchez', email: 'pedro@ionic.com', rol: 'admin', fecha: '2024-04-05', estado: 'Activo' },
+  statsMetrics = signal<any[]>([]);
+  usuarios: UserTransaction[] = [];
+  allUsers: UserTransaction[] = [];
+  activities = signal<UserActivity[]>([]);
+  currentUserId: string | null = null;
+  rowActions = [
+    { key: 'role', label: 'Cambiar rol', icon: 'shield-outline', color: 'primary' },
+    { key: 'status', label: 'Cambiar estado', icon: 'pause-circle-outline', color: 'warning' },
+    { key: 'delete', label: 'Eliminar usuario', icon: 'trash-outline', color: 'danger' },
   ];
 
   columns: string[] = ['nombre', 'email', 'rol', 'estado', 'fecha'];
@@ -91,71 +103,243 @@ export class AdminDashboardPage implements OnInit {
   ];
 
   chart: Chart | undefined;
-  // Usando Angular Signals para estado reactivo de carga
   isLoading = signal<boolean>(true);
+  refreshing = signal<boolean>(false);
+  activeTab = signal<'overview' | 'users' | 'activity'>('overview');
+  activeActionKey = signal<string | null>(null);
+  readonly themeService = inject(ThemeService);
   userRole: string | null = null;
+  monthlyPerformance: any[] = [];
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private alertController: AlertController,
     private toastController: ToastController,
-    private reportService: ReportService
+    private reportService: ReportService,
+    private dataService: DataService,
+    private supabaseService: SupabaseService
   ) {
+    addIcons({ 'sunny-outline': sunnyOutline, 'moon-outline': moonOutline });
     this.userRole = this.authService.getCurrentRole();
   }
 
   ngOnInit() {
-    setTimeout(() => {
-      this.reportService.getMetrics().subscribe((metrics) => {
-        this.usuariosActivos = metrics.find((m) => m.label === 'Usuarios')?.value || this.usuariosActivos;
-        this.transacciones = metrics.find((m) => m.label === 'Ventas')?.value || this.transacciones;
-        this.productos = metrics.find((m) => m.label === 'Productos')?.value || this.productos;
-        this.ingresos = '$' + (metrics.find((m) => m.label === 'Ingresos (€)')?.value || 12450).toLocaleString();
-        this.isLoading.set(false);
-        setTimeout(() => this.createMixedChart(), 100);
-      });
-    }, 800);
+    void this.loadAdminData();
   }
 
-  ngAfterViewInit() {
-    setTimeout(() => {
-      if (!this.isLoading()) {
-        this.createMixedChart();
+  async loadAdminData(): Promise<boolean> {
+    this.isLoading.set(true);
+    try {
+      const [metrics, performance, profiles, activities, { data: authData, error: authError }] =
+        await Promise.all([
+          firstValueFrom(this.dataService.getStatsMetrics()),
+          firstValueFrom(this.dataService.getMonthlyPerformance()),
+          firstValueFrom(this.dataService.getProfiles()),
+          firstValueFrom(this.dataService.getRecentActivities()),
+          this.supabaseService.getUser(),
+        ]);
+      if (authError) {
+        throw authError;
       }
-    }, 100);
+
+      this.currentUserId = authData.user?.id || null;
+      this.statsMetrics.set(metrics);
+      this.monthlyPerformance = performance;
+      this.activities.set(
+        activities.map((activity) => ({
+          ...activity,
+          user_label:
+            profiles.find((profile) => profile.id === activity.user_id)?.email || activity.user_id,
+        }))
+      );
+      this.allUsers = profiles
+        .sort((a, b) => {
+          const da = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const db = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return db - da;
+        })
+        .map((profile) => ({
+          id: profile.id,
+          nombre: profile.full_name || profile.name || profile.username || profile.email?.split('@')[0] || 'Usuario',
+          email: profile.email || '',
+          rol: profile.role || 'user',
+          fecha: profile.created_at
+            ? new Date(profile.created_at).toISOString().split('T')[0]
+            : '—',
+          estado: profile.status === 'Inactivo' || profile.active === false ? 'Inactivo' : 'Activo',
+        }));
+      this.usuarios = [...this.allUsers];
+      setTimeout(() => this.createMixedChart(), 100);
+      return true;
+    } catch (error) {
+      console.error('Error al cargar los datos de administración:', error);
+      await this.showToast('No se pudieron cargar los datos de administración', 'danger');
+      return false;
+    } finally {
+      this.isLoading.set(false);
+      this.refreshing.set(false);
+    }
   }
 
+  async refreshData() {
+    this.refreshing.set(true);
+    if (await this.loadAdminData()) {
+      await this.showToast('Datos actualizados correctamente', 'success');
+    }
+  }
+
+  selectTab(value: unknown) {
+    if (value === 'overview' || value === 'users' || value === 'activity') {
+      this.activeTab.set(value);
+      if (value === 'overview') {
+        setTimeout(() => this.createMixedChart(), 100);
+      }
+    }
+  }
+
+  async onUserAction(event: { action: string; row: UserTransaction }) {
+    const { action, row } = event;
+    this.activeActionKey.set(`${row.id}:${action}`);
+    try {
+      if (action === 'role') {
+        const role = row.rol === 'admin' ? 'user' : 'admin';
+        await this.dataService.updateUserRole(row.id, role);
+        const refreshed = await this.loadAdminData();
+        await this.showToast(
+          refreshed ? `Rol actualizado a ${role}` : `Rol actualizado a ${role}, pero no se pudo refrescar la tabla`,
+          refreshed ? 'success' : 'warning'
+        );
+      } else if (action === 'status') {
+        const active = row.estado !== 'Activo';
+        await this.dataService.updateUserStatus(row.id, active);
+        const status = active ? 'Activo' : 'Inactivo';
+        const refreshed = await this.loadAdminData();
+        await this.showToast(
+          refreshed ? `Estado actualizado a ${status}` : `Estado actualizado a ${status}, pero no se pudo refrescar la tabla`,
+          refreshed ? 'success' : 'warning'
+        );
+      } else if (action === 'delete') {
+        await this.confirmDeleteUser(row);
+      }
+    } catch (error) {
+      console.error('Error al actualizar el usuario:', error);
+      await this.showToast(this.getErrorMessage(error, 'No se pudo completar la acción'), 'danger');
+    } finally {
+      this.activeActionKey.set(null);
+    }
+  }
+
+  async confirmDeleteUser(row: UserTransaction) {
+    if (row.id === this.currentUserId) {
+      await this.showToast('No puedes eliminar tu propia cuenta desde el panel', 'warning');
+      return;
+    }
+    const alert = await this.alertController.create({
+      header: 'Eliminar Usuario',
+      message: `¿Seguro que deseas eliminar a ${row.nombre}? Esta acción no se puede deshacer.`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await this.dataService.deleteUserAccount(row.id);
+              const refreshed = await this.loadAdminData();
+              await this.showToast(
+                refreshed ? 'Usuario eliminado correctamente' : 'Usuario eliminado, pero no se pudo refrescar la tabla',
+                refreshed ? 'success' : 'warning'
+              );
+            } catch (error) {
+              console.error('Error al eliminar usuario:', error);
+              await this.showToast(this.getErrorMessage(error, 'No se pudo eliminar el usuario'), 'danger');
+            }
+          },
+        },
+      ],
+    });
+    await alert.present();
+    await alert.onDidDismiss();
+  }
+
+  private async showToast(message: string, color: 'success' | 'danger' | 'warning') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2500,
+      color,
+      position: 'bottom',
+    });
+    await toast.present();
+  }
+
+  private getErrorMessage(error: unknown, fallback: string): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    if (typeof error === 'object' && error !== null && 'message' in error) {
+      const message = error.message;
+      if (typeof message === 'string') {
+        return message;
+      }
+    }
+
+    return fallback;
+  }
+
+
+  getMetricIcon(label: string): string {
+    const key = (label || '').toLowerCase();
+    if (key.includes('usuario')) return 'people-outline';
+    if (key.includes('ingreso')) return 'cash-outline';
+    if (key.includes('venta') || key.includes('transac')) return 'swap-outline';
+    if (key.includes('producto')) return 'cube-outline';
+    return 'stats-chart-outline';
+  }
+
+  getMetricColor(label: string): string {
+    const key = (label || '').toLowerCase();
+    if (key.includes('usuario')) return 'primary';
+    if (key.includes('ingreso')) return 'success';
+    if (key.includes('venta') || key.includes('transac')) return 'warning';
+    if (key.includes('producto')) return 'tertiary';
+    return 'primary';
+  }
 
   createMixedChart() {
-    if (this.mixedChart) {
+    if (this.mixedChart && this.monthlyPerformance.length > 0) {
       const ctx = this.mixedChart.nativeElement.getContext('2d');
       if (ctx) {
         if (this.chart) {
           this.chart.destroy();
         }
         this.chart = new Chart(ctx, {
-          type: 'bar',
+          type: 'line',
           data: {
-            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+            labels: this.monthlyPerformance.map((m: any) => m.month),
             datasets: [
               {
                 label: 'Ventas',
-                type: 'bar',
-                data: [65, 59, 80, 81, 56, 95],
-                backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1,
-                order: 2,
+                data: this.monthlyPerformance.map((m: any) => m.sales),
+                backgroundColor: 'rgba(59, 130, 246, 0.22)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.4,
+                fill: true,
               },
               {
                 label: 'Ingresos (€)',
-                type: 'line',
-                data: [4500, 5200, 7800, 8100, 5600, 9500],
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                data: this.monthlyPerformance.map((m: any) => m.income),
+                borderColor: 'rgba(16, 185, 129, 1)',
+                backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                borderWidth: 3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
                 tension: 0.4,
-                order: 1,
+                fill: false,
                 yAxisID: 'y1',
               },
             ],
@@ -210,17 +394,7 @@ export class AdminDashboardPage implements OnInit {
     await alert.present();
   }
 
-  async mostrarToast() {
-    const toast = await this.toastController.create({
-      message: 'Datos actualizados correctamente',
-      duration: 2000,
-      position: 'bottom',
-      color: 'success',
-    });
-    await toast.present();
-  }
-
-  async logout() {
+  async   logout() {
     const alert = await this.alertController.create({
       header: 'Cerrar Sesión',
       message: '¿Estás seguro de que deseas cerrar sesión?',
@@ -234,13 +408,18 @@ export class AdminDashboardPage implements OnInit {
           role: 'destructive',
           handler: () => {
             this.authService.logout();
-            this.router.navigate(['/login']);
+            try {
+              this.router.navigate(['/login']);
+            } catch (e) {
+              window.location.href = '/login';
+            }
           },
         },
       ],
     });
     await alert.present();
   }
+
 
   exportPDF() {
     this.reportService.exportToPDF('admin-dashboard-content', 'informe_admin.pdf');
@@ -250,7 +429,3 @@ export class AdminDashboardPage implements OnInit {
     this.reportService.exportToCSV(this.usuarios, 'usuarios_informe.csv');
   }
 }
-
-
-
-

@@ -1,10 +1,6 @@
 .login-content {
-  --background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+  --background: var(--app-auth-background);
 }
-
-
-
-
 
 .login-container {
   display: flex;
@@ -18,12 +14,13 @@
 .login-logo-section {
   text-align: center;
   margin-bottom: 32px;
-  color: white;
+  color: var(--app-auth-text);
 }
 
 .login-logo-icon {
   font-size: 64px;
   margin-bottom: 12px;
+  color: var(--ion-color-primary);
 }
 
 .login-app-title {
@@ -36,14 +33,15 @@
 .login-app-subtitle {
   font-size: 14px;
   margin: 4px 0 0 0;
-  opacity: 0.9;
+  color: var(--app-auth-muted);
   font-weight: 400;
 }
 
 .login-card {
   width: 100%;
   max-width: 400px;
-  background: var(--ion-background-color);
+  --background: var(--app-auth-surface);
+  color: var(--app-auth-text);
   border-radius: 16px;
   padding: 32px 24px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -54,21 +52,25 @@
 }
 
 .custom-input-item {
-  --background: var(--ion-color-light);
+  --background: var(--app-auth-input);
+  --color: var(--app-auth-text);
   --border-radius: 12px;
   --padding-start: 12px;
   --inner-padding-end: 12px;
   border-radius: 12px;
   margin-bottom: 4px;
+  border: 1px solid var(--app-auth-border);
 }
 
 .input-icon {
-  color: var(--ion-color-medium);
+  color: var(--app-auth-muted);
   font-size: 20px;
   margin-right: 8px;
 }
 
 .custom-input {
+  --color: var(--app-auth-text);
+  --placeholder-color: var(--app-auth-muted);
   --padding-start: 8px;
   --padding-end: 8px;
   --padding-top: 12px;

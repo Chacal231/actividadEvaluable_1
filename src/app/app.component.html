@@ -1,7 +1,44 @@
 <ion-app>
-  <app-menu></app-menu>
-  <ion-router-outlet id="main-content"></ion-router-outlet>
+  <ion-split-pane contentId="main-content" when="never">
+    <ion-menu
+      *ngIf="isMenuVisible"
+      contentId="main-content"
+      type="overlay"
+      menuId="main-menu"
+      style="--width: 280px; --max-width: 280px;"
+    >
+      <ion-header class="ion-no-border">
+        <ion-toolbar class="menu-header-toolbar">
+          <div class="menu-header-content">
+            <ion-icon name="business-outline" class="menu-logo-icon"></ion-icon>
+            <ion-title class="menu-title">Actividad Evaluable</ion-title>
+          </div>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="menu-content">
+        <div class="menu-role-section">
+          <ion-badge [color]="userRole === 'admin' ? 'warning' : 'primary'" class="role-badge">
+            {{ userRole === 'admin' ? 'Administrador' : 'Usuario' }}
+          </ion-badge>
+        </div>
+        <ion-list class="menu-list" lines="none">
+          <ion-menu-toggle auto-hide="false" *ngFor="let item of menuItems">
+            <ion-item
+              *ngIf="hasAccess(item.roles)"
+              button
+              (click)="navigateTo(item.route)"
+              class="menu-item"
+              [attr.aria-label]="'Ir a ' + item.title"
+              detail="false"
+            >
+              <ion-icon [name]="item.icon" slot="start" class="menu-item-icon"></ion-icon>
+              <ion-label class="menu-item-label">{{ item.title }}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
+      </ion-content>
+    </ion-menu>
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+  </ion-split-pane>
+
 </ion-app>
-
-
-

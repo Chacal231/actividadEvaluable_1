@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { from, Observable, of } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ToastController } from '@ionic/angular';
@@ -11,15 +11,21 @@ export interface BusinessMetric {
   value: number;
 }
 
+export interface Profile {
+  id: string;
+  email: string;
+  role?: string;
+  full_name?: string;
+  created_at?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class ReportService {
   private supabase: SupabaseClient;
 
-  // eslint-disable-next-line @angular-eslint/prefer-inject
   constructor(private toastController: ToastController) {
-    // Inicializamos el cliente de Supabase con tus credenciales
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
 
@@ -33,16 +39,30 @@ export class ReportService {
           console.error('Error al cargar métricas desde Supabase:', error);
           return [];
         }
-        // Mapeamos los campos de la BD (title y value) a la interfaz BusinessMetric (label y value)
         return (data || []).map((item: any) => ({
-          label: item.title,
-          value: Number(item.value)
+          label: item.title || item.label || item.name,
+          value: Number(item.value || item.count || 0),
         })) as BusinessMetric[];
       });
 
-    // Convertimos la promesa de Supabase a un Observable de RxJS
     return from(promise);
   }
+
+  getProfiles(): Observable<Profile[]> {
+    const promise = this.supabase
+      .from('profiles')
+      .select('*')
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Error al cargar perfiles desde Supabase:', error);
+          return [];
+        }
+        return (data || []) as Profile[];
+      });
+
+    return from(promise);
+  }
+
 
   async exportToCSV(data: any[], fileName: string = 'informe.csv'): Promise<void> {
     if (!data || data.length === 0) {

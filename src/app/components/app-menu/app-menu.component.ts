@@ -60,4 +60,3 @@ export class AppMenuComponent implements OnInit {
     return this.userRole ? roles.includes(this.userRole) : false;
   }
 }
-

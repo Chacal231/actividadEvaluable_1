@@ -1,6 +1,17 @@
 <ion-header [translucent]="true" class="ion-no-border">
   <ion-toolbar>
     <ion-title>Login</ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        fill="clear"
+        (click)="themeService.toggleTheme()"
+        [attr.aria-label]="themeService.themeLabel()"
+        [title]="themeService.themeLabel()"
+        class="theme-toggle-button"
+      >
+        <ion-icon slot="icon-only" [name]="themeService.isDark() ? 'sunny-outline' : 'moon-outline'"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -15,74 +26,79 @@
     <div class="login-logo-section">
       <ion-icon name="business-outline" class="login-logo-icon"></ion-icon>
       <h1 class="login-app-title">Actividad Evaluable 1</h1>
-      <p class="login-app-subtitle">Gestión Empresarial</p>
+      <p class="login-app-subtitle">Plataforma SaaS Empresarial</p>
     </div>
 
-    <div class="login-card">
-      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-        <div class="input-group">
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
-            <ion-input
-              type="email"
-              formControlName="email"
-              placeholder="Correo electrónico"
-              class="custom-input"
-            ></ion-input>
-          </ion-item>
-          <ion-note color="danger" class="error-note" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')">
-            El email es requerido
-          </ion-note>
-          <ion-note color="danger" class="error-note" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.hasError('email')">
-            Email con formato inválido
-          </ion-note>
+    <ion-card class="login-card" mode="ios">
+      <ion-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+          <div class="input-group">
+            <ion-item lines="none" class="custom-input-item">
+              <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
+              <ion-input
+                type="email"
+                name="email"
+                formControlName="email"
+                placeholder="Correo electrónico"
+                autocomplete="username"
+                autocapitalize="off"
+                spellcheck="false"
+                class="custom-input"
+              ></ion-input>
+            </ion-item>
+            <ion-note color="danger" class="error-note" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')">
+              El email es requerido
+            </ion-note>
+            <ion-note color="danger" class="error-note" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.hasError('email')">
+              Email con formato inválido
+            </ion-note>
+          </div>
+
+          <div class="input-group">
+            <ion-item lines="none" class="custom-input-item">
+              <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
+              <ion-input
+                type="password"
+                formControlName="password"
+                placeholder="Contraseña"
+                class="custom-input"
+              ></ion-input>
+            </ion-item>
+            <ion-note color="danger" class="error-note" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')">
+              La contraseña es requerida
+            </ion-note>
+            <ion-note color="danger" class="error-note" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('minlength')">
+              Mínimo 6 caracteres
+            </ion-note>
+          </div>
+
+          <ion-button expand="block" type="submit" [disabled]="loginForm.invalid || isLoading" class="login-button ion-margin-top" mode="ios">
+            <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+            <span *ngIf="!isLoading">Iniciar Sesión</span>
+          </ion-button>
+        </form>
+
+        <ion-text color="danger" *ngIf="errorMessage">
+          <p class="ion-text-center error-message">{{ errorMessage }}</p>
+        </ion-text>
+
+        <div class="register-link-section">
+          <ion-button expand="block" fill="clear" (click)="goToRegister()" class="register-button">
+            ¿No tienes cuenta? <strong>Regístrate</strong>
+          </ion-button>
         </div>
 
-        <div class="input-group">
-          <ion-item lines="none" class="custom-input-item">
-            <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
-            <ion-input
-              type="password"
-              formControlName="password"
-              placeholder="Contraseña"
-              class="custom-input"
-            ></ion-input>
-          </ion-item>
-          <ion-note color="danger" class="error-note" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')">
-            La contraseña es requerida
-          </ion-note>
-          <ion-note color="danger" class="error-note" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('minlength')">
-            Mínimo 6 caracteres
-          </ion-note>
+        <div class="quick-access-section">
+          <p class="quick-access-title">Acceso rápido para pruebas</p>
+          <ion-button expand="block" fill="outline" size="small" (click)="loginAsAdmin()" class="quick-access-button" mode="ios">
+            Acceso rápido: Administrador
+          </ion-button>
+          <ion-button expand="block" fill="outline" size="small" (click)="loginAsUser()" class="quick-access-button" mode="ios">
+            Acceso rápido: Usuario Estándar
+          </ion-button>
         </div>
-
-        <ion-button expand="block" type="submit" [disabled]="loginForm.invalid" class="login-button ion-margin-top">
-          Iniciar Sesión
-        </ion-button>
-      </form>
-
-      <ion-text color="danger" *ngIf="errorMessage">
-        <p class="ion-text-center error-message">{{ errorMessage }}</p>
-      </ion-text>
-
-      <div class="register-link-section">
-        <ion-button expand="block" fill="clear" (click)="goToRegister()" class="register-button">
-          ¿No tienes cuenta? <strong>Regístrate</strong>
-        </ion-button>
-      </div>
-
-      <div class="quick-access-section">
-        <p class="quick-access-title">Acceso rápido para pruebas</p>
-        <ion-button expand="block" fill="outline" size="small" (click)="loginAsAdmin()" class="quick-access-button">
-          Acceso rápido: Administrador
-        </ion-button>
-        <ion-button expand="block" fill="outline" size="small" (click)="loginAsUser()" class="quick-access-button">
-          Acceso rápido: Usuario Estándar
-        </ion-button>
-      </div>
-    </div>
+      </ion-card-content>
+    </ion-card>
   </div>
 </ion-content>
-
-
 

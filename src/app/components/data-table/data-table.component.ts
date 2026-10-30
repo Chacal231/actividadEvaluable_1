@@ -13,7 +13,16 @@ import {
   IonSelectOption,
   IonButton,
   IonIcon,
+  IonSpinner,
+  IonBadge,
 } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import {
+  pauseCircleOutline,
+  playCircle,
+  shieldOutline,
+  trashOutline,
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-data-table',
@@ -34,19 +43,33 @@ import {
     IonSelectOption,
     IonButton,
     IonIcon,
+    IonSpinner,
+    IonBadge,
   ],
 })
 export class DataTableComponent implements OnChanges {
   @Input() data: any[] = [];
   @Input() columns: string[] = [];
   @Input() filterableFields: { key: string; label: string; options: string[] }[] = [];
+  @Input() rowActions: { key: string; label: string; icon: string; color: string }[] = [];
+  @Input() actionLoadingKey: string | null = null;
   @Output() rowSelected = new EventEmitter<any>();
+  @Output() actionSelected = new EventEmitter<{ action: string; row: any }>();
 
   searchTerm: string = '';
   filteredData: any[] = [];
   filters: { [key: string]: string } = {};
   currentPage: number = 1;
   pageSize: number = 5;
+
+  constructor() {
+    addIcons({
+      'shield-outline': shieldOutline,
+      'pause-circle-outline': pauseCircleOutline,
+      'play-circle': playCircle,
+      'trash-outline': trashOutline,
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data']) {
@@ -93,6 +116,34 @@ export class DataTableComponent implements OnChanges {
     this.rowSelected.emit(item);
   }
 
+  onActionClick(event: Event, action: string, item: any): void {
+    event.stopPropagation();
+    if (this.actionLoadingKey) {
+      return;
+    }
+    this.actionSelected.emit({ action, row: item });
+  }
+
+  isActionLoading(action: string, item: any): boolean {
+    return this.actionLoadingKey === `${item.id}:${action}`;
+  }
+
+  getActionIcon(action: string, item: any): string {
+    if (action === 'status') {
+      return item.estado === 'Activo' ? 'pause-circle-outline' : 'play-circle';
+    }
+
+    return action === 'role' ? 'shield-outline' : 'trash-outline';
+  }
+
+  getActionColor(action: string, item: any, defaultColor: string): string {
+    if (action === 'status') {
+      return item.estado === 'Activo' ? 'warning' : 'success';
+    }
+
+    return defaultColor;
+  }
+
   getColumnValue(item: any, column: string): any {
     return item[column];
   }
@@ -125,5 +176,3 @@ export class DataTableComponent implements OnChanges {
     }
   }
 }
-
-

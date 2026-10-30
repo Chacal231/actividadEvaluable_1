@@ -34,27 +34,27 @@
 }
 
 .icon-bg-primary {
-  background: rgba(var(--ion-color-primary-rgb), 0.1);
+  background: rgba(59, 130, 246, 0.15);
 }
 
 .icon-bg-secondary {
-  background: rgba(var(--ion-color-secondary-rgb), 0.1);
+  background: rgba(148, 163, 184, 0.15);
 }
 
 .icon-bg-success {
-  background: rgba(var(--ion-color-success-rgb), 0.1);
+  background: rgba(16, 185, 129, 0.15);
 }
 
 .icon-bg-warning {
-  background: rgba(var(--ion-color-warning-rgb), 0.1);
+  background: rgba(245, 158, 11, 0.15);
 }
 
 .icon-bg-danger {
-  background: rgba(var(--ion-color-danger-rgb), 0.1);
+  background: rgba(239, 68, 68, 0.15);
 }
 
 .icon-bg-tertiary {
-  background: rgba(var(--ion-color-tertiary-rgb), 0.1);
+  background: rgba(139, 92, 246, 0.15);
 }
 
 .stat-card-icon {
@@ -62,28 +62,29 @@
 }
 
 .icon-bg-primary .stat-card-icon {
-  color: var(--ion-color-primary);
+  color: #3b82f6;
 }
 
 .icon-bg-success .stat-card-icon {
-  color: var(--ion-color-success);
+  color: #10b981;
 }
 
 .icon-bg-warning .stat-card-icon {
-  color: var(--ion-color-warning);
+  color: #f59e0b;
 }
 
 .icon-bg-danger .stat-card-icon {
-  color: var(--ion-color-danger);
+  color: #ef4444;
 }
 
 .icon-bg-secondary .stat-card-icon {
-  color: var(--ion-color-secondary);
+  color: #94a3b8;
 }
 
 .icon-bg-tertiary .stat-card-icon {
-  color: var(--ion-color-tertiary);
+  color: #a78bfa;
 }
+
 
 .icon-skeleton {
   width: 28px;
@@ -99,10 +100,11 @@
 
 .stat-card-title {
   font-size: 13px;
-  font-weight: 500;
-  color: var(--ion-color-medium);
+  font-weight: 600;
+  color: var(--ion-color-dark);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  opacity: 0.9;
 }
 
 .stat-card-value {
@@ -111,6 +113,7 @@
   color: var(--ion-text-color);
   line-height: 1.2;
 }
+
 
 .value-skeleton {
   width: 80px;
