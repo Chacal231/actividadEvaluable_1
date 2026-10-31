@@ -112,10 +112,20 @@ export class UserDashboardPage implements OnInit {
     this.errorMessage.set('');
 
     try {
-      const { data: authData } = await this.supabaseService.getUser();
-      const user = authData?.user;
+      let userId: string | null;
+      let userEmail: string | undefined;
+      if (this.authService.isDemoMode()) {
+        userId = this.authService.getDemoUserId();
+      } else {
+        const { data, error } = await this.supabaseService.getUser();
+        if (error) {
+          throw error;
+        }
+        userId = data.user?.id || null;
+        userEmail = data.user?.email;
+      }
 
-      if (!user) {
+      if (!userId) {
         this.isLoading.set(false);
         this.router.navigate(['/login']);
         return;
@@ -129,9 +139,8 @@ export class UserDashboardPage implements OnInit {
             return;
           }
 
-          const profile =
-            profiles.find((p) => p.id === user.id) ||
-            profiles.find((p) => p.email?.toLowerCase() === user.email?.toLowerCase());
+          const profile = profiles.find((item) => item.id === userId) ||
+            profiles.find((item) => item.email?.toLowerCase() === userEmail?.toLowerCase());
 
           if (profile) {
             this.userProfile.set(profile);

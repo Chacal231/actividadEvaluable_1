@@ -154,13 +154,7 @@ export class LoginPage {
           console.error('Error al registrar inicio de sesión:', activityError);
         }
 
-        this.authService.login(email, password);
-
-        try {
-          if (typeof (this.authService as any).setRole === 'function') {
-            (this.authService as any).setRole(role);
-          }
-        } catch (e) {}
+        this.authService.setAuthenticatedRole(role);
 
 
         const toast = await this.toastController.create({
@@ -203,29 +197,15 @@ export class LoginPage {
 
   loginAsAdmin() {
     this.authService.logout();
-    try {
-      if (typeof (this.authService as any).setRole === 'function') {
-        (this.authService as any).setRole('admin');
-      }
-    } catch (e) {}
-    const success = this.authService.login('admin@ionic.com', 'admin123');
-    if (success) {
-      this.router.navigateByUrl('/admin-dashboard');
-    }
+    this.authService.startDemoSession('admin');
+    this.router.navigateByUrl('/admin-dashboard');
   }
 
 
   loginAsUser() {
     this.authService.logout();
-    try {
-      if (typeof (this.authService as any).setRole === 'function') {
-        (this.authService as any).setRole('user');
-      }
-    } catch (e) {}
-    const success = this.authService.login('user@ionic.com', 'user123');
-    if (success) {
-      this.router.navigateByUrl('/user-dashboard');
-    }
+    this.authService.startDemoSession('user');
+    this.router.navigateByUrl('/user-dashboard');
   }
 
 

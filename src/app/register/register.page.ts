@@ -153,15 +153,6 @@ export class RegisterPage {
           return;
         }
 
-        try {
-          this.authService.register(email, password, 'user', nombre);
-          if (typeof (this.authService as any).setRole === 'function') {
-            (this.authService as any).setRole('user');
-          }
-        } catch (e) {
-          console.error('AuthService register error:', e);
-        }
-
         const toast = await this.toastController.create({
           message: 'Registro exitoso. Puedes iniciar sesión.',
           duration: 3000,
@@ -200,4 +191,3 @@ export class RegisterPage {
     this.router.navigate(['/login']);
   }
 }
-

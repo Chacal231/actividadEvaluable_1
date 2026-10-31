@@ -11,13 +11,24 @@ import { AdminDashboardPage } from './admin-dashboard.page';
 describe('AdminDashboardPage', () => {
   let component: AdminDashboardPage;
   let fixture: ComponentFixture<AdminDashboardPage>;
+  const authServiceMock = {
+    getCurrentRole: () => 'admin',
+    isDemoMode: vi.fn(() => false),
+    getDemoUserId: vi.fn(() => null as string | null),
+  };
+  const supabaseServiceMock = {
+    getUser: vi.fn(async () => ({ data: { user: null }, error: null })),
+  };
 
   beforeEach(async () => {
+    authServiceMock.isDemoMode.mockReturnValue(false);
+    authServiceMock.getDemoUserId.mockReturnValue(null);
+    supabaseServiceMock.getUser.mockClear();
     await TestBed.configureTestingModule({
       imports: [AdminDashboardPage],
       providers: [
         { provide: Router, useValue: { navigate: vi.fn(), navigateByUrl: vi.fn() } },
-        { provide: AuthService, useValue: { getCurrentRole: () => 'admin' } },
+        { provide: AuthService, useValue: authServiceMock },
         {
           provide: DataService,
           useValue: {
@@ -28,12 +39,12 @@ describe('AdminDashboardPage', () => {
           },
         },
         { provide: ReportService, useValue: {} },
-        {
-          provide: SupabaseService,
-          useValue: { getUser: async () => ({ data: { user: null }, error: null }) },
-        },
+        { provide: SupabaseService, useValue: supabaseServiceMock },
         { provide: AlertController, useValue: { create: vi.fn() } },
-        { provide: ToastController, useValue: { create: vi.fn() } },
+        {
+          provide: ToastController,
+          useValue: { create: vi.fn(async () => ({ present: vi.fn() })) },
+        },
       ],
     })
       .overrideComponent(AdminDashboardPage, { set: { template: '' } })
@@ -46,5 +57,15 @@ describe('AdminDashboardPage', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should load demo data without requesting a Supabase user', async () => {
+    authServiceMock.isDemoMode.mockReturnValue(true);
+    authServiceMock.getDemoUserId.mockReturnValue('demo-admin');
+    supabaseServiceMock.getUser.mockClear();
+
+    expect(await component.loadAdminData()).toBe(true);
+    expect(component.currentUserId).toBe('demo-admin');
+    expect(supabaseServiceMock.getUser).not.toHaveBeenCalled();
   });
 });

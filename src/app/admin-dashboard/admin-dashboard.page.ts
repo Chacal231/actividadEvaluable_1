@@ -181,7 +181,15 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
   async loadAdminData(): Promise<boolean> {
     this.isLoading.set(true);
     try {
-      const [metrics, performance, profiles, activities, { data: authData, error: authError }] =
+      const currentUserId = this.authService.isDemoMode()
+        ? Promise.resolve(this.authService.getDemoUserId())
+        : this.supabaseService.getUser().then(({ data, error }) => {
+            if (error) {
+              throw error;
+            }
+            return data.user?.id || null;
+          });
+      const [metrics, performance, profiles, activities, userId] =
         await Promise.all([
           firstValueFrom(this.dataService.getStatsMetrics()),
           firstValueFrom(this.dataService.getMonthlyPerformance()).catch((error: unknown) => {
@@ -190,13 +198,10 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
           }),
           firstValueFrom(this.dataService.getProfiles()),
           firstValueFrom(this.dataService.getRecentActivities()),
-          this.supabaseService.getUser(),
+          currentUserId,
         ]);
-      if (authError) {
-        throw authError;
-      }
 
-      this.currentUserId = authData.user?.id || null;
+      this.currentUserId = userId;
       this.statsMetrics.set(metrics);
       this.monthlyPerformance = this.withPerformanceFallback(performance);
       this.activities.set(
@@ -564,10 +569,28 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
 
 
   exportPDF() {
-    this.reportService.exportToPDF('admin-dashboard-content', 'informe_admin.pdf');
+    const reportRows = this.usuarios.map((user) => ({
+      nombre: user.nombre,
+      email: user.email,
+      rol: user.rol,
+      estado: user.estado,
+      fecha: user.fecha,
+    }));
+    void this.reportService.exportToPDF(
+      reportRows,
+      'informe_admin.pdf',
+      'Informe de usuarios'
+    );
   }
 
   exportCSV() {
-    this.reportService.exportToCSV(this.usuarios, 'usuarios_informe.csv');
+    const reportRows = this.usuarios.map((user) => ({
+      nombre: user.nombre,
+      email: user.email,
+      rol: user.rol,
+      estado: user.estado,
+      fecha: user.fecha,
+    }));
+    void this.reportService.exportToCSV(reportRows, 'usuarios_informe.csv');
   }
 }

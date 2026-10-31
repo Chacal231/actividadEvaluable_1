@@ -12,7 +12,7 @@ Aplicación web de gestión con interfaz adaptable, áreas diferenciadas para ad
 - **Supabase:** Supabase Auth y PostgreSQL; el script SQL del proyecto define políticas RLS y funciones RPC para operaciones administrativas.
 - **Gráficos:** Chart.js 4.x.
 - **Interfaz:** SCSS, Ionic Grid y componentes adaptables.
-- **Informes:** exportación CSV y PDF con jsPDF y html2canvas.
+- **Informes:** exportación tabulada CSV y PDF con jsPDF.
 - **Pruebas:** Vitest y Angular TestBed.
 
 Las versiones anteriores corresponden a los manifiestos actuales del repositorio. La versión mayor de PostgreSQL depende de la instancia Supabase utilizada y debe comprobarse en su panel.
@@ -54,7 +54,7 @@ El cliente del navegador solo debe usar una clave publicable con permisos limita
 
 ## Despliegue continuo en Vercel
 
-El repositorio contiene la configuración de compilación y el fallback de rutas SPA en [vercel.json](./vercel.json). Para activar el despliegue:
+El repositorio contiene la configuración de compilación y el fallback de rutas SPA en [vercel.json](./vercel.json). Para conectar el proyecto o reproducir la configuración:
 
 1. Importa este repositorio de GitHub en Vercel.
 2. Deja como directorio raíz del proyecto la raíz del repositorio. Configura la instalación con `npm ci`, el comando de compilación con `npm run build` y el directorio de salida con `www`.
@@ -62,11 +62,11 @@ El repositorio contiene la configuración de compilación y el fallback de rutas
 4. Guarda la configuración y lanza el primer despliegue. A partir de ahí, Vercel despliega automáticamente las actualizaciones publicadas en `main`; las demás ramas pueden generar despliegues de vista previa.
 5. Comprueba que `/login`, `/admin-dashboard` y `/user-dashboard` resuelven desde la URL pública. El fallback SPA evita que refrescar una ruta Angular produzca un 404.
 
-La configuración local prepara el build, pero conectar el repositorio, definir la rama de producción y verificar una URL publicada son pasos que requieren acceso a la cuenta Vercel del propietario.
+**Despliegue publicado:** [https://actividad-evaluable-1.vercel.app](https://actividad-evaluable-1.vercel.app). La versión desplegada antes de estos últimos cambios resolvía las rutas `/login`, `/admin-dashboard` y `/user-dashboard`. Al publicar los cambios en `main`, Vercel debe desplegar la versión actualizada; verifica de nuevo esas rutas después de que finalice el despliegue. El modo demo actualizado utiliza datos sintéticos en memoria y no llama a Supabase; para validar datos protegidos hace falta una sesión real.
 
 ## Guía rápida de prueba
 
-En la pantalla de login están disponibles los botones **Acceso rápido: Administrador** y **Acceso rápido: Usuario Estándar**. Son accesos locales de demostración implementados por `AuthService`; sirven para revisar la navegación y la interfaz, pero **no crean una sesión en Supabase ni sustituyen credenciales reales**. Por ello, las llamadas protegidas a la base de datos pueden fallar si se usa ese acceso.
+En la pantalla de login están disponibles los botones **Acceso rápido: Administrador** y **Acceso rápido: Usuario Estándar**. Activan un modo demo local para revisar las pantallas con datos sintéticos, incluidos perfiles, actividad, métricas y rendimiento. Los cambios hechos en modo demo solo viven en memoria y se pierden al recargar la aplicación. **No crean una sesión/token de Supabase ni sustituyen credenciales reales**; las consultas y mutaciones demo no se envían a la base de datos. El PDF de administración y el CSV se generan como tablas con la lista de usuarios visible.
 
 Para probar autenticación y datos reales, configura Supabase, registra cuentas de prueba en ese proyecto e inicia sesión con sus credenciales. El panel administrativo requiere un perfil con rol `admin`; el alta ordinaria asigna el rol `user`. Verifica las políticas RLS antes de exponer la instancia o los datos.
 
