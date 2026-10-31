@@ -29,7 +29,13 @@ import { SupabaseService } from '../services/supabase';
 import { DataService } from '../services/data';
 import { ThemeService } from '../services/theme.service';
 import { addIcons } from 'ionicons';
-import { moonOutline, sunnyOutline } from 'ionicons/icons';
+import {
+  businessOutline,
+  lockClosedOutline,
+  mailOutline,
+  moonOutline,
+  sunnyOutline,
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-login',
@@ -72,7 +78,13 @@ export class LoginPage {
     private dataService: DataService,
     private toastController: ToastController
   ) {
-    addIcons({ 'sunny-outline': sunnyOutline, 'moon-outline': moonOutline });
+    addIcons({
+      'business-outline': businessOutline,
+      'lock-closed-outline': lockClosedOutline,
+      'mail-outline': mailOutline,
+      'sunny-outline': sunnyOutline,
+      'moon-outline': moonOutline,
+    });
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],

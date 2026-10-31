@@ -14,7 +14,6 @@ import {
   IonButton,
   IonIcon,
   IonSpinner,
-  IonBadge,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
@@ -44,7 +43,6 @@ import {
     IonButton,
     IonIcon,
     IonSpinner,
-    IonBadge,
   ],
 })
 export class DataTableComponent implements OnChanges {

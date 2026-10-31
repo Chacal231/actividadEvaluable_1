@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { from, Observable } from 'rxjs';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { ToastController } from '@ionic/angular';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../environments/environment';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseService } from './supabase';
 
 export interface BusinessMetric {
   label: string;
@@ -25,8 +23,11 @@ export interface Profile {
 export class ReportService {
   private supabase: SupabaseClient;
 
-  constructor(private toastController: ToastController) {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+  constructor(
+    private toastController: ToastController,
+    supabaseService: SupabaseService
+  ) {
+    this.supabase = supabaseService.client;
   }
 
   // MÉTODO CONECTADO A SUPABASE: Obtiene los datos reales de la tabla 'reports'
@@ -142,6 +143,10 @@ export class ReportService {
     await loadingToast.present();
 
     try {
+      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+        import('jspdf'),
+        import('html2canvas'),
+      ]);
       const canvas = await html2canvas(element);
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');

@@ -42,21 +42,21 @@
     aria-label="Secciones del panel de administración"
   >
     <ion-segment-button value="overview">
-      <ion-icon name="stats-chart-outline"></ion-icon>
+      <ion-icon name="stats-chart-outline" slot="start"></ion-icon>
       <ion-label>Resumen y Estadísticas</ion-label>
     </ion-segment-button>
     <ion-segment-button value="users">
-      <ion-icon name="people-outline"></ion-icon>
+      <ion-icon name="people-outline" slot="start"></ion-icon>
       <ion-label>Gestión de Usuarios</ion-label>
     </ion-segment-button>
     <ion-segment-button value="activity">
-      <ion-icon name="clipboard-outline"></ion-icon>
+      <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
       <ion-label>Auditoría y Actividad</ion-label>
     </ion-segment-button>
   </ion-segment>
 
   <div id="admin-dashboard-content" class="dashboard-container">
-    <ng-container *ngIf="activeTab() === 'overview'">
+    <div class="dashboard-panel" [hidden]="activeTab() !== 'overview'">
     <h2 class="section-title">Estadísticas</h2>
     <ion-grid>
       <ion-row>
@@ -64,8 +64,8 @@
           <app-stat-card
             [title]="(metric.title || metric.label) || ''"
             [value]="metric.value ?? 0"
-            [icon]="metric.icon || getMetricIcon(metric.title || metric.label || '')"
-            [color]="metric.color || getMetricColor(metric.title || metric.label || '')"
+            [icon]="getMetricIcon(metric.title || metric.label || '')"
+            [color]="getMetricColor(metric.title || metric.label || '')"
             [trend]="metric.change_text || metric.trend || ''"
             [trendDirection]="metric.is_positive === false || metric.trend_direction === 'down' ? 'down' : (metric.is_positive === true || metric.trend_direction === 'up' ? 'up' : (metric.trend_direction || 'neutral'))"
             [loading]="isLoading()"
@@ -85,14 +85,54 @@
     <h2 class="section-title ion-margin-top">Análisis de Rendimiento</h2>
     <ion-card class="chart-card">
       <ion-card-header>
-        <ion-card-title>Gráfico Mixto - Ventas e Ingresos</ion-card-title>
+        <ion-card-title>Ventas e ingresos</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <div class="chart-container-mixed" *ngIf="!isLoading()">
-          <canvas #mixedChart></canvas>
+        <div class="chart-controls">
+          <ion-segment
+            [value]="performancePeriod"
+            (ionChange)="setPerformancePeriod($event.detail.value)"
+            aria-label="Período del gráfico de rendimiento"
+            class="performance-period"
+          >
+            <ion-segment-button value="last6">
+              <ion-label>Últimos 6 meses</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="year">
+              <ion-label>Este año</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="quarter">
+              <ion-label>Último trimestre</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+
+          <div class="chart-series-controls" aria-label="Series visibles">
+            <ion-button
+              [fill]="showSales() ? 'solid' : 'outline'"
+              color="primary"
+              [attr.aria-pressed]="showSales()"
+              (click)="toggleSalesVisibility()"
+            >
+              <ion-icon name="trending-up-outline" slot="start"></ion-icon>
+              Ver ventas
+            </ion-button>
+            <ion-button
+              [fill]="showIncome() ? 'solid' : 'outline'"
+              color="success"
+              [attr.aria-pressed]="showIncome()"
+              (click)="toggleIncomeVisibility()"
+            >
+              <ion-icon name="cash-outline" slot="start"></ion-icon>
+              Ver ingresos (€)
+            </ion-button>
+          </div>
         </div>
-        <div class="chart-skeleton" *ngIf="isLoading()">
-          <ion-spinner name="crescent" color="primary"></ion-spinner>
+
+        <div class="chart-container-mixed">
+          <canvas #mixedChart></canvas>
+          <div class="chart-loading-overlay" *ngIf="isLoading()">
+            <ion-spinner name="crescent" color="primary"></ion-spinner>
+          </div>
         </div>
       </ion-card-content>
 
@@ -117,9 +157,9 @@
         </ion-row>
       </ion-grid>
     </div>
-    </ng-container>
+    </div>
 
-    <ng-container *ngIf="activeTab() === 'users'">
+    <div class="dashboard-panel" [hidden]="activeTab() !== 'users'">
     <div class="section-heading ion-margin-top">
       <h2 class="section-title">Gestión de Usuarios</h2>
       <ion-button fill="outline" color="primary" (click)="refreshData()" [disabled]="refreshing()">
@@ -137,9 +177,9 @@
       (rowSelected)="onRowSelected($event)"
       (actionSelected)="onUserAction($event)"
     ></app-data-table>
-    </ng-container>
+    </div>
 
-    <ng-container *ngIf="activeTab() === 'activity'">
+    <div class="dashboard-panel" [hidden]="activeTab() !== 'activity'">
     <h2 class="section-title ion-margin-top">Actividad reciente</h2>
     <ion-card class="activity-card">
       <ion-card-content>
@@ -156,6 +196,6 @@
         </div>
       </ion-card-content>
     </ion-card>
-    </ng-container>
+    </div>
   </div>
 </ion-content>

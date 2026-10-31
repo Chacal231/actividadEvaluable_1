@@ -32,7 +32,7 @@ import { DataService, Profile, UserActivity } from '../services/data';
 import { SupabaseService } from '../services/supabase';
 import { ThemeService } from '../services/theme.service';
 import { addIcons } from 'ionicons';
-import { moonOutline, sunnyOutline } from 'ionicons/icons';
+import { logOutOutline, moonOutline, sunnyOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -89,7 +89,11 @@ export class UserDashboardPage implements OnInit {
     private supabaseService: SupabaseService,
     private toastController: ToastController
   ) {
-    addIcons({ 'sunny-outline': sunnyOutline, 'moon-outline': moonOutline });
+    addIcons({
+      'log-out-outline': logOutOutline,
+      'sunny-outline': sunnyOutline,
+      'moon-outline': moonOutline,
+    });
   }
 
   ngOnInit() {

@@ -1,12 +1,15 @@
 import { TestBed } from '@angular/core/testing';
-import { Data } from './data';
+import { DataService } from './data';
+import { SupabaseService } from './supabase';
 
-describe('Data', () => {
-  let service: Data;
+describe('DataService', () => {
+  let service: DataService;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Data);
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      providers: [SupabaseService],
+    }).compileComponents();
+    service = TestBed.inject(DataService);
   });
 
   it('should be created', () => {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { from, Observable } from 'rxjs';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../environments/environment';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseService } from './supabase';
 
 export interface StatsMetric {
   id?: number;
@@ -57,8 +57,8 @@ export interface UserActivityCounts {
 export class DataService {
   private supabase: SupabaseClient;
 
-  constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+  constructor(supabaseService: SupabaseService) {
+    this.supabase = supabaseService.client;
   }
 
 
