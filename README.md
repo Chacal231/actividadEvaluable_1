@@ -74,7 +74,7 @@ Con una sesión real, el panel administrativo permite consultar métricas, filtr
 
 ## Documentación y entrega
 
-- [Memoria técnica del proyecto](./docs/MEMORIA_TECNICA.md).
+- [Memoria técnica del proyecto](.docs/Memoria Actividad Evaluable 1 - Desarrollo de Interfaces.pdf).
 - [Especificaciones y rúbrica de la actividad](./Actividad%20individual%201%20-%20Individual%20-%20DI%200488_.pdf).
 
 La memoria técnica describe la arquitectura y configuración observables en este repositorio; no implica que exista un despliegue remoto ya conectado. La entrega final debe incluir un único ZIP con el PDF solicitado, la URL real del repositorio, la URL pública verificada, credenciales de prueba utilizables y evidencias Lighthouse de Accesibilidad y Mejores prácticas con una puntuación mínima de 90. No incluyas secretos ni datos reales de terceros en el documento de entrega.
